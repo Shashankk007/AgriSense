@@ -27,7 +27,7 @@ const Layout = () => {
 
       {/* Dynamic Content Panel */}
       <main className="grow p-6 md:p-10">
-        <Outlet /> {/* Yahan tumhare nested components render honge */}
+        <Outlet /> {/* This will render the content of the selected route */}
       </main>
     </div>
   );

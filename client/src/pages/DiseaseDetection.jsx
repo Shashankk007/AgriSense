@@ -25,7 +25,7 @@ const DiseaseDetection = () => {
   
   {/* Left Side: Uploaded Image Preview */}
   <div className="w-full md:w-36 h-36 shrink-0 bg-white rounded-xl border border-green-100 overflow-hidden shadow-sm relative">
-    {/* Maine ek dummy leaf image laga di hai test karne ke liye */}
+    {/* Placeholder for uploaded image */}
     <img 
       src="http://googleusercontent.com/image_collection/image_retrieval/8810832440045785188" 
       alt="Analyzed Leaf" 

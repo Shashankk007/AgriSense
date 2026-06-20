@@ -5,7 +5,8 @@ import Layout from './pages/Layout.jsx'
 import Dashboard from './pages/Dashboard.jsx'
 import CropPrediction from './pages/CropPrediction.jsx'
 import DiseaseDetection from './pages/DiseaseDetection.jsx'
-import Auth from './pages/Auth.jsx' // Naya import
+import Auth from './pages/Auth.jsx' 
+import Signup from './pages/Signup';
 
 const App = () => {
   return (
@@ -14,6 +15,7 @@ const App = () => {
         {/* Main Public Landing Page */}
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Auth />} />
+        <Route path="/signup" element={<Signup />} />
         {/* Nested AI Tooling Workspace Routes */}
         <Route path="/workspace" element={<Layout />}>
           <Route index element={<Dashboard />} />

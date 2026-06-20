@@ -74,7 +74,7 @@ const Navbar = () => {
             <Link to="/login" className="font-medium text-gray-600 hover:text-green-600 transition-colors">
               Log in
             </Link>
-            <Link to="/login" className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 px-6 rounded-full shadow-sm transition-all hover:-translate-y-0.5">
+            <Link to="/signup" className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 px-6 rounded-full shadow-sm transition-all hover:-translate-y-0.5">
               Sign up
             </Link>
           </>

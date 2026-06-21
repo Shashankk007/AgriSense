@@ -7,6 +7,7 @@ import CropPrediction from './pages/CropPrediction.jsx'
 import DiseaseDetection from './pages/DiseaseDetection.jsx'
 import Auth from './pages/Auth.jsx' 
 import Signup from './pages/Signup';
+import Profile from './pages/Profile';
 
 const App = () => {
   return (
@@ -21,6 +22,7 @@ const App = () => {
           <Route index element={<Dashboard />} />
           <Route path="crop-prediction" element={<CropPrediction />} />
           <Route path="disease-detection" element={<DiseaseDetection />} />
+          <Route path="profile" element={<Profile />} />
         </Route>
       </Routes>
     </div>

@@ -1,26 +1,44 @@
-import React from 'react';
+import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
-import { jwtDecode } from "jwt-decode";
+import { AuthContext } from '../context/AuthContext'; 
+import { googleLoginAPI } from '../api/farmApi'; 
 
 const Signup = () => {
   const navigate = useNavigate();
+  const { setUser } = useContext(AuthContext); // Get setUser from memory
+  const [isLoading, setIsLoading] = useState(false); // UI loading state
 
-  const handleSuccess = (credentialResponse) => {
-    const decoded = jwtDecode(credentialResponse.credential);
-    localStorage.setItem('agrisense_user', JSON.stringify(decoded));
-    navigate('/'); 
+  // Secure Google Auth handler
+  const handleSuccess = async (credentialResponse) => {
+    setIsLoading(true);
+    try {
+      // Send token to backend for secure HttpOnly cookie
+      const data = await googleLoginAPI(credentialResponse.credential);
+      if (data.success) {
+        setUser(data.user); // Store in React state
+        navigate('/workspace'); // Redirect to dashboard
+      }
+    } catch (error) {
+      console.error("Signup failed:", error);
+      alert("Authentication failed. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
+  // Manual form handler
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Detailed Signup Form Submitted!");
+    // Future: Add backend API call for manual signup here
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-[#f3f9f6] py-10">
       <div className="bg-white p-8 sm:p-10 rounded-4xl shadow-sm border border-gray-100 w-full max-w-lg relative z-10">
         
+        {/* Header Section */}
         <div className="text-center mb-8">
           <h1 className="text-2xl font-extrabold text-green-600 tracking-tight flex items-center justify-center gap-2">
             🌱 Agrisense
@@ -29,6 +47,7 @@ const Signup = () => {
           <p className="text-gray-500 text-sm mt-2">Fill in your details to start your smart farming journey.</p>
         </div>
 
+        {/* Manual Signup Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
@@ -66,16 +85,33 @@ const Signup = () => {
           </button>
         </form>
 
+        {/* Divider */}
         <div className="my-6 flex items-center justify-center space-x-4">
           <div className="h-px bg-gray-100 w-full"></div>
           <span className="text-gray-400 text-xs font-semibold uppercase tracking-wider">OR</span>
           <div className="h-px bg-gray-100 w-full"></div>
         </div>
 
-        <div className="flex justify-center">
-          <GoogleLogin onSuccess={handleSuccess} onError={() => console.log('Signup Failed')} shape="rectangular" theme="outline" text="signup_with" size="large" />
+        {/* Google Auth Section */}
+        <div className="flex justify-center flex-col items-center gap-2">
+          {isLoading ? (
+            <div className="text-sm font-semibold text-green-600 animate-pulse">Setting up your account...</div>
+          ) : (
+            <GoogleLogin 
+              onSuccess={handleSuccess} 
+              onError={() => {
+                console.log('Signup Failed');
+                alert('Google connection failed.');
+              }} 
+              shape="rectangular" 
+              theme="outline" 
+              text="signup_with" 
+              size="large" 
+            />
+          )}
         </div>
 
+        {/* Login Link */}
         <p className="text-center text-sm text-gray-600 mt-8">
           Already have an account? <Link to="/login" className="text-green-600 font-bold hover:underline transition-all">Log in</Link>
         </p>

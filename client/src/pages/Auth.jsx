@@ -1,25 +1,35 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
-import { jwtDecode } from "jwt-decode";
+import { AuthContext } from '../context/AuthContext'; 
+import { googleLoginAPI } from '../api/farmApi'; 
 
 const Auth = () => {
   const navigate = useNavigate();
-  // Ye state check karegi ki user Login page par hai ya Sign Up page par
+  const { setUser } = useContext(AuthContext); 
   const [isLogin, setIsLogin] = useState(true);
+  const [isLoading, setIsLoading] = useState(false); 
 
-  // Google Login Success Handler
-  const handleSuccess = (credentialResponse) => {
-    const decoded = jwtDecode(credentialResponse.credential);
-    localStorage.setItem('agrisense_user', JSON.stringify(decoded));
-    navigate('/'); 
+  // 🛡️ Naya Secure Google Login Handler
+  const handleSuccess = async (credentialResponse) => {
+    setIsLoading(true);
+    try {
+      const data = await googleLoginAPI(credentialResponse.credential);
+      if (data.success) {
+        setUser(data.user); 
+        navigate('/workspace'); 
+      }
+    } catch (error) {
+      console.error("Login failed:", error);
+      alert("Authentication failed. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // Normal Form Submit Handler
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Form Submitted!");
-    // Yahan aage chalkar hum backend API call karenge
+    console.log("Form Submitted! (Need to connect backend for Email/Password)");
   };
 
   return (
@@ -95,28 +105,33 @@ const Auth = () => {
         </div>
 
         {/* Google Login Component */}
-        <div className="flex justify-center">
-          <GoogleLogin
-            onSuccess={handleSuccess}
-            onError={() => {
-              console.log('Login Failed');
-            }}
-            shape="rectangular"
-            theme="outline"
-            text={isLogin ? "signin_with" : "signup_with"}
-            size="large"
-          />
+        <div className="flex justify-center flex-col items-center gap-2">
+          {isLoading ? (
+            <div className="text-sm font-semibold text-green-600 animate-pulse">Securing your session...</div>
+          ) : (
+            <GoogleLogin
+              onSuccess={handleSuccess}
+              onError={() => {
+                console.log('Login Failed');
+                alert("Google connection failed.");
+              }}
+              shape="rectangular"
+              theme="outline"
+              text={isLogin ? "signin_with" : "signup_with"}
+              size="large"
+            />
+          )}
         </div>
 
-        {/* Toggle Login/Signup Mode */}
+        {/* Redirect to Signup Route */}
         <p className="text-center text-sm text-gray-600 mt-8">
-          {isLogin ? "Don't have an account? " : "Already have an account? "}
-          <button 
-            onClick={() => setIsLogin(!isLogin)} 
+          Don't have an account?{' '}
+          <Link 
+            to="/signup" 
             className="text-green-600 font-bold hover:underline transition-all"
           >
-            {isLogin ? 'Sign up' : 'Log in'}
-          </button>
+            Sign up
+          </Link>
         </p>
 
       </div>

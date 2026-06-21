@@ -1,6 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { AuthContext } from '../context/AuthContext'; // 👈 Context Import Kiya
 
 const Profile = () => {
+  // 👈 Memory se user ka data nikala
+  const { user } = useContext(AuthContext);
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -11,14 +15,11 @@ const Profile = () => {
     plan: 'Premium Farmer'
   });
 
-  // LocalStorage se data nikal kar form me pre-fill karna
+  // Jab page load ho, toh Context wale user data ko form me daal do
   useEffect(() => {
-    const storedUser = localStorage.getItem('agrisense_user');
-    if (storedUser) {
-      const parsedUser = JSON.parse(storedUser);
-      
+    if (user) {
       // Google se aane wale poore naam ko First aur Last me split kar rahe hain
-      const nameParts = parsedUser.name ? parsedUser.name.split(' ') : [''];
+      const nameParts = user.name ? user.name.split(' ') : [''];
       const fName = nameParts[0] || '';
       const lName = nameParts.slice(1).join(' ') || '';
 
@@ -26,14 +27,14 @@ const Profile = () => {
         ...prev,
         firstName: fName,
         lastName: lName,
-        email: parsedUser.email || '',
-        picture: parsedUser.picture || '',
+        email: user.email || '',
+        picture: user.picture || '',
         // Asli app me phone aur address backend se aayega, abhi ke liye empty default
-        phone: parsedUser.phone || '',
-        address: parsedUser.address || ''
+        phone: user.phone || '',
+        address: user.address || ''
       }));
     }
-  }, []);
+  }, [user]); // 👈 Dependency array me user daala taaki user object aate hi form update ho jaye
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -45,6 +46,9 @@ const Profile = () => {
     // Yahan backend API call aayega jo details database me update karega
     alert("Profile successfully updated! 🌱");
   };
+
+  // Agar user data fetch ho raha hai (fast network par shayed dikhe bhi na)
+  if (!user) return <div className="p-8 text-center text-gray-500 font-semibold">Loading Profile...</div>;
 
   return (
     <div className="max-w-4xl mx-auto">

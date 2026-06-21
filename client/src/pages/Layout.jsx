@@ -1,25 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useContext } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext'; // 👈 Naya Import
 
 const Layout = () => {
   const navigate = useNavigate();
-  const location = useLocation(); // Check karne ke liye ki konsa page open hai
-  const [user, setUser] = useState(null);
+  const location = useLocation(); 
+  
+  // Accessing user data and logout function from AuthContext
+  const { user, logout } = useContext(AuthContext);
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem('agrisense_user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem('agrisense_user');
-    setUser(null);
+  //LogOut Handler
+  const handleLogout = async () => {
+    await logout(); // Logout function from context will clear user data and tell backend to clear cookie
     navigate('/login');
   };
 
-  // Helper function: Check karega ki link active hai ya nahi
   const isActive = (path) => location.pathname === path;
 
   return (
@@ -28,7 +23,6 @@ const Layout = () => {
       {/* Sidebar Container */}
       <aside className="w-full md:w-72 bg-white border-r border-gray-200 flex flex-col h-screen sticky top-0 shadow-sm z-10">
         
-        {/* Top Logo - Ab yehi tumhara Home Button hai */}
         <div className="p-6 pb-4">
           <Link to="/" className="text-2xl font-extrabold tracking-tight text-green-600 hover:opacity-80 transition-opacity flex items-center gap-2">
             🌱 Agrisense
@@ -71,12 +65,11 @@ const Layout = () => {
           </Link>
         </nav>
 
-        {/* Bottom Section: Screenshot style User Profile */}
+        {/* Bottom Section: User Profile */}
         <div className="p-4 border-t border-gray-100">
           {user ? (
             <div className="flex items-center justify-between gap-1">
               
-              {/* NAYE CHANGES: flex-1 aur min-w-0 add kiya hai */}
               <Link 
                 to="/workspace/profile" 
                 className="flex items-center gap-3 hover:bg-gray-50 p-2 -ml-2 rounded-xl transition-colors cursor-pointer flex-1 min-w-0"
@@ -95,14 +88,12 @@ const Layout = () => {
                   </div>
                 )}
                 
-                {/* NAYE CHANGES: Yahan bhi flex-1 aur min-w-0 add kiya hai */}
                 <div className="flex flex-col flex-1 min-w-0">
                   <span className="text-sm font-bold text-gray-900 truncate">{user.name}</span>
                   <span className="text-xs font-medium text-gray-500 truncate">Premium Farmer</span>
                 </div>
               </Link>
               
-              {/* Logout Icon */}
               <button 
                 onClick={handleLogout} 
                 className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all shrink-0"

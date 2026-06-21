@@ -1,22 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
 
-  // Component load hone par check karo ki user logged in hai ya nahi
-  useEffect(() => {
-    const storedUser = localStorage.getItem('agrisense_user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-  }, []);
+  const { user, logout } = useContext(AuthContext);
 
-  // Logout function
-  const handleLogout = () => {
-    localStorage.removeItem('agrisense_user');
-    setUser(null);
+  const handleLogout = async () => {
+    await logout(); // Context wala logout call hoga
     navigate('/');
   };
 

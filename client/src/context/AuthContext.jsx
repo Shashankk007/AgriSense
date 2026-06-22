@@ -1,11 +1,45 @@
-import React, { createContext, useState } from 'react';
-import { logoutAPI } from '../api/farmApi';
+import React, { createContext, useEffect, useState } from 'react';
+import { getCurrentUserAPI, logoutAPI } from '../api/farmApi';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   // User data is stored strictly in React memory
   const [user, setUser] = useState(null);
+  const [authReady, setAuthReady] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const bootstrapAuth = async () => {
+      try {
+        const data = await getCurrentUserAPI();
+        if (isMounted) {
+          setUser({
+            id: data._id || data.id,
+            name: data.username || data.name,
+            email: data.email,
+            picture: data.profileImage,
+            profileImage: data.profileImage,
+          });
+        }
+      } catch (error) {
+        if (isMounted) {
+          setUser(null);
+        }
+      } finally {
+        if (isMounted) {
+          setAuthReady(true);
+        }
+      }
+    };
+
+    bootstrapAuth();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const logout = async () => {
     try {
@@ -17,7 +51,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, logout }}>
+    <AuthContext.Provider value={{ user, setUser, logout, authReady }}>
       {children}
     </AuthContext.Provider>
   );

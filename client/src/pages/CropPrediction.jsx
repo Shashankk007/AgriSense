@@ -1,9 +1,74 @@
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import MapDrawer from '../components/MapDrawer';
+import { AuthContext } from '../context/AuthContext';
+import { getFarmsAPI } from '../api/farmApi';
+import { getFarmNdviAPI } from '../api/mlApi';
 
 const CropPrediction = () => {
+  const { user } = useContext(AuthContext);
+
   // Ye state track karegi ki user Map dekhna chahta hai ya Manual Form
   const [inputMode, setInputMode] = useState('map'); 
+  const [farms, setFarms] = useState([]);
+  const [selectedFarmId, setSelectedFarmId] = useState('');
+  const [ndviResult, setNdviResult] = useState(null);
+  const [loadingFarms, setLoadingFarms] = useState(false);
+  const [loadingNdvi, setLoadingNdvi] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const loadFarms = async () => {
+      if (!user) return;
+
+      setLoadingFarms(true);
+      setError('');
+      try {
+        const data = await getFarmsAPI();
+        setFarms(data.farms || []);
+        const latestFarmId = data.farms?.[0]?._id || '';
+        setSelectedFarmId(latestFarmId);
+      } catch (err) {
+        setError('Unable to load farms from the backend.');
+      } finally {
+        setLoadingFarms(false);
+      }
+    };
+
+    loadFarms();
+  }, [user]);
+
+  const loadNdviForFarm = async (farmId) => {
+    if (!farmId) return;
+
+    setLoadingNdvi(true);
+    setError('');
+    try {
+      const data = await getFarmNdviAPI(farmId);
+      setNdviResult(data);
+    } catch (err) {
+      const message = err?.response?.data?.detail || err?.response?.data?.message || 'Unable to fetch NDVI data.';
+      setError(message);
+      setNdviResult(null);
+    } finally {
+      setLoadingNdvi(false);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedFarmId) {
+      loadNdviForFarm(selectedFarmId);
+    }
+  }, [selectedFarmId]);
+
+  const handleFarmSaved = (farm) => {
+    if (!farm?._id) return;
+
+    setFarms((current) => {
+      const filtered = current.filter((item) => item._id !== farm._id);
+      return [farm, ...filtered];
+    });
+    setSelectedFarmId(farm._id);
+  };
 
   return (
     <div className="max-w-6xl mx-auto">
@@ -47,7 +112,7 @@ const CropPrediction = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
           
           <div className="lg:col-span-2">
-            <MapDrawer />
+            <MapDrawer farmName="My Farm" onFarmSaved={handleFarmSaved} />
           </div>
 
           <div className="bg-white p-6 rounded-4xl shadow-sm border border-gray-100 flex flex-col justify-start">
@@ -71,10 +136,65 @@ const CropPrediction = () => {
               </li>
             </ul>
 
-            <div className="mt-8 p-4 bg-green-50 rounded-xl border border-green-100">
-              <p className="text-xs text-green-800 font-bold text-center">
-                ✨ Prediction results will appear here after saving your farm boundary.
-              </p>
+            <div className="mt-8 space-y-4">
+              <div className="p-4 bg-green-50 rounded-xl border border-green-100">
+                <p className="text-xs text-green-800 font-bold text-center">
+                  ✨ Prediction results will appear here after saving your farm boundary.
+                </p>
+              </div>
+
+              <div className="p-4 bg-white rounded-xl border border-gray-200 shadow-sm">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Saved farms</label>
+                <select
+                  value={selectedFarmId}
+                  onChange={(e) => setSelectedFarmId(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none"
+                  disabled={loadingFarms}
+                >
+                  {farms.length === 0 ? (
+                    <option value="">No farms available</option>
+                  ) : (
+                    farms.map((farm) => (
+                      <option key={farm._id} value={farm._id}>
+                        {farm.farmName}
+                      </option>
+                    ))
+                  )}
+                </select>
+                <button
+                  type="button"
+                  onClick={() => loadNdviForFarm(selectedFarmId)}
+                  disabled={!selectedFarmId || loadingNdvi}
+                  className="mt-3 w-full bg-gray-900 hover:bg-gray-800 disabled:bg-gray-400 text-white font-semibold py-2.5 rounded-xl transition-colors"
+                >
+                  {loadingNdvi ? 'Analyzing...' : 'Fetch NDVI'}
+                </button>
+              </div>
+
+              {ndviResult && (
+                <div className="p-4 bg-white rounded-xl border border-green-200 shadow-sm space-y-2">
+                  <h4 className="text-sm font-bold text-gray-800">ML result</h4>
+                  <p className="text-sm text-gray-600"><span className="font-semibold">Farm:</span> {ndviResult.farmName}</p>
+                  <p className="text-sm text-gray-600"><span className="font-semibold">Average NDVI:</span> {Number(ndviResult.averageNdvi).toFixed(3)}</p>
+                  <p className="text-sm text-gray-600"><span className="font-semibold">Updated:</span> {ndviResult.lastUpdated}</p>
+                  <a
+                    href={ndviResult.tileUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex mt-2 text-green-700 font-semibold text-sm hover:underline"
+                  >
+                    Open tile preview
+                  </a>
+                </div>
+              )}
+
+              {loadingFarms && (
+                <p className="text-sm text-gray-500">Loading saved farms...</p>
+              )}
+
+              {error && (
+                <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl p-3">{error}</p>
+              )}
             </div>
           </div>
 

@@ -6,6 +6,12 @@ import { v2 as cloudinary } from "cloudinary";
 import apiError from "../utils/apiError.js";
 import uploadProfileImage from "../utils/uploadProfileImage.js";
 
+const authCookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+};
+
 
 const registerUser = wrapAsync(async (req, res) => {
     
@@ -27,15 +33,13 @@ const registerUser = wrapAsync(async (req, res) => {
 
     // Upload profileImage if provided
     const profileImageLocalPath = req.file?.path;
-   
+
     let profileImageUrl = "";
     if (profileImageLocalPath) {
         try {
-            profileImageUrl = await avatarUpload(profileImageLocalPath);
+            profileImageUrl = await uploadProfileImage(profileImageLocalPath);
         } catch (error) {
-            // console.error("profileImage upload failed:", error);
             throw new apiError(500, "profileImage upload failed", error);
-            // return res.status(500).json({ message: "Avatar upload failed.", error });
         }
     }
 
@@ -46,17 +50,26 @@ const registerUser = wrapAsync(async (req, res) => {
         email,
         profileImage: profileImageUrl
     });
-    
+
+    // Generate tokens and set cookies so user is auto-logged-in after signup
+    const accesstoken = newUser.generateAccessToken();
+    const refreshtoken = newUser.generateRefreshToken();
+    newUser.refreshToken = refreshtoken;
+    await newUser.save({ validateBeforeSave: false });
 
     // Remove sensitive fields from response
     const userResponse = {
         id: newUser._id,
         username: newUser.username,
         email: newUser.email,
-        avatar: newUser.avatar,
+        profileImage: newUser.profileImage,
     };
 
-    res.status(201).json(userResponse);
+    res
+        .status(201)
+        .cookie("accesstoken", accesstoken, authCookieOptions)
+        .cookie("refreshtoken", refreshtoken, authCookieOptions)
+        .json(userResponse);
 });
 
 
@@ -65,6 +78,10 @@ const loginUser = wrapAsync(async (req, res) => {
     // console.log("req.body:", req.body);
     if (!(username || email)) {
         throw new apiError(400, "Username or Email is required")
+    }
+
+    if (!password) {
+        throw new apiError(400, "Password is required")
     }
 
 
@@ -84,15 +101,10 @@ const loginUser = wrapAsync(async (req, res) => {
     await user.save({ validateBeforeSave: false }); //skip validation
     
 
-    const options = {
-        httpOnly: true, //cookie cannot be modified by the client side
-        secure: true,
-    }
-
     return res
         .status(200)
-        .cookie('accesstoken', accesstoken, options)
-        .cookie('refreshtoken', refreshtoken, options)
+        .cookie('accesstoken', accesstoken, authCookieOptions)
+        .cookie('refreshtoken', refreshtoken, authCookieOptions)
         .json({ message: "User logged in successfully" });
 });
 
@@ -111,15 +123,10 @@ const logoutUser = wrapAsync(async(req, res) => {
         }
     )
 
-    const options = {
-        httpOnly: true,
-        secure: true
-    }
-
     return res
     .status(200)
-    .clearCookie("accesstoken", options)
-    .clearCookie("refreshtoken", options)
+    .clearCookie("accesstoken", authCookieOptions)
+    .clearCookie("refreshtoken", authCookieOptions)
     .json("User logged Out successfully")
 })
 
@@ -148,11 +155,6 @@ const refreshAccessToken = wrapAsync(async (req, res) => {
             
         }
     
-        const options = {
-            httpOnly: true,
-            secure: true
-        }
-    
         const accesstoken = user.generateAccessToken();
         const newRefreshtoken = user.generateRefreshToken();
         user.refreshToken = newRefreshtoken; // save the new refresh token in the database
@@ -160,8 +162,8 @@ const refreshAccessToken = wrapAsync(async (req, res) => {
     
         return res
         .status(200)
-        .cookie("accessToken", accesstoken, options)
-        .cookie("refreshToken", newRefreshtoken, options)
+        .cookie("accesstoken", accesstoken, authCookieOptions)
+        .cookie("refreshtoken", newRefreshtoken, authCookieOptions)
         .json({ message: "Access token refreshed"})
 
     } catch (error) {
@@ -197,7 +199,7 @@ const changePassword = wrapAsync(async (req, res) => {
 })
 
 const changeProfileImage = wrapAsync(async (req, res) => {
-    const profileImageLocalPath = req.file.path;
+    const profileImageLocalPath = req.file?.path;
 
     if(!profileImageLocalPath){
         throw new apiError(400, "Avatar is required")
@@ -223,12 +225,15 @@ const changeProfileImage = wrapAsync(async (req, res) => {
 
     return res
     .status(200)
-    .json({message : "Profile image updated successfully"}, {user})
+    .json({
+        message: "Profile image updated successfully",
+        user,
+    })
     
 })
 
 const getUser = wrapAsync(async(req, res) => {
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(req.user.id).select("-password -refreshToken");
     if (!user) {
         throw new apiError(404, "User not found");
     }

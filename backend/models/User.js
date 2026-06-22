@@ -44,12 +44,11 @@ const userSchema = new mongoose.Schema(
 
 //here we are hashing the password before saving it to the database
 
-userSchema.pre("save", async function (next) {
+userSchema.pre("save", async function () {
   if (this.isModified("password")) {
     // Hash only if the password is modified
     this.password = await bcrypt.hash(this.password, 12);
   }
-  next();
 });
 
 //we use methods to create a method for the schema

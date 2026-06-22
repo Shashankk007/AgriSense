@@ -13,6 +13,70 @@ export const saveFarmBoundaryAPI = async (farmName, coordinates) => {
   }
 };
 
+export const getFarmsAPI = async () => {
+  try {
+    const response = await apiClient.get('/farms');
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch farms:', error);
+    throw error;
+  }
+};
+
+export const getFarmByIdAPI = async (farmId) => {
+  try {
+    const response = await apiClient.get(`/farms/${farmId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch farm:', error);
+    throw error;
+  }
+};
+
+export const deleteFarmAPI = async (farmId) => {
+  try {
+    const response = await apiClient.delete(`/farms/${farmId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to delete farm:', error);
+    throw error;
+  }
+};
+
+export const loginAPI = async (email, password) => {
+  try {
+    const response = await apiClient.post('/auth/login', { email, password });
+    return response.data;
+  } catch (error) {
+    console.error('Login failed:', error);
+    throw error;
+  }
+};
+
+export const registerAPI = async ({ username, email, password }) => {
+  try {
+    const response = await apiClient.post('/auth/register', {
+      username,
+      email,
+      password,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Registration failed:', error);
+    throw error;
+  }
+};
+
+export const getCurrentUserAPI = async () => {
+  try {
+    const response = await apiClient.get('/auth/me');
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch current user:', error);
+    throw error;
+  }
+};
+
 // Google Login API Call
 export const googleLoginAPI = async (credential) => {
   try {

@@ -2,12 +2,28 @@ import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import { AuthContext } from '../context/AuthContext'; 
-import { googleLoginAPI } from '../api/farmApi'; 
+import { googleLoginAPI, registerAPI } from '../api/farmApi'; 
 
 const Signup = () => {
   const navigate = useNavigate();
   const { setUser } = useContext(AuthContext); // Get setUser from memory
   const [isLoading, setIsLoading] = useState(false); // UI loading state
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const buildUsername = () => {
+    const firstPart = `${firstName}${lastName}`
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '');
+    const emailPart = email
+      .split('@')[0]
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '');
+    const base = firstPart || emailPart || 'farmer';
+    return `${base}_${Date.now().toString().slice(-6)}`;
+  };
 
   // Secure Google Auth handler
   const handleSuccess = async (credentialResponse) => {
@@ -16,7 +32,13 @@ const Signup = () => {
       // Send token to backend for secure HttpOnly cookie
       const data = await googleLoginAPI(credentialResponse.credential);
       if (data.success) {
-        setUser(data.user); // Store in React state
+        setUser({
+          id: data.user.id,
+          name: data.user.username || data.user.name,
+          email: data.user.email,
+          picture: data.user.profileImage,
+          profileImage: data.user.profileImage,
+        }); // Store in React state
         navigate('/workspace'); // Redirect to dashboard
       }
     } catch (error) {
@@ -28,10 +50,29 @@ const Signup = () => {
   };
 
   // Manual form handler
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Detailed Signup Form Submitted!");
-    // Future: Add backend API call for manual signup here
+    setIsLoading(true);
+    try {
+      const normalizedEmail = email.trim().toLowerCase();
+      const username = buildUsername();
+
+      const data = await registerAPI({ username, email: normalizedEmail, password });
+      setUser({
+        id: data.id,
+        name: data.username,
+        email: data.email,
+        picture: data.profileImage,
+        profileImage: data.profileImage,
+      });
+      navigate('/workspace');
+    } catch (error) {
+      console.error('Registration failed:', error);
+      const backendMessage = error?.response?.data?.message || error?.response?.data?.detail || error?.message;
+      alert(backendMessage || 'Could not create account. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -52,11 +93,11 @@ const Signup = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1.5">First Name</label>
-              <input type="text" className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all text-sm" placeholder="Ramesh" required />
+              <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all text-sm" placeholder="Ramesh" required />
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1.5">Last Name</label>
-              <input type="text" className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all text-sm" placeholder="Kumar" required />
+              <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all text-sm" placeholder="Kumar" required />
             </div>
           </div>
 
@@ -67,7 +108,7 @@ const Signup = () => {
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1.5">Email Address</label>
-            <input type="email" className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all text-sm" placeholder="farmer@agrisense.com" required />
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all text-sm" placeholder="farmer@agrisense.com" required />
           </div>
 
           <div>
@@ -77,11 +118,11 @@ const Signup = () => {
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1.5">Create Password</label>
-            <input type="password" className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all text-sm" placeholder="••••••••" minLength="6" required />
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all text-sm" placeholder="••••••••" minLength="6" required />
           </div>
 
-          <button type="submit" className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl transition-all hover:-translate-y-0.5 shadow-sm mt-4">
-            Create Account
+          <button type="submit" className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl transition-all hover:-translate-y-0.5 shadow-sm mt-4" disabled={isLoading}>
+            {isLoading ? 'Creating account...' : 'Create Account'}
           </button>
         </form>
 

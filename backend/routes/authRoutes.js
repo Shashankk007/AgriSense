@@ -4,6 +4,7 @@ import { OAuth2Client } from "google-auth-library";
 
 import { User } from "../models/User.js";
 import {
+  registerUser,
   loginUser,
   logoutUser,
   refreshAccessToken,
@@ -37,6 +38,7 @@ async function createUniqueUsername(baseUsername) {
 }
 
 router.post("/login", loginUser);
+router.post("/register", registerUser);
 
 router.post(
   "/google-login",

@@ -6,13 +6,21 @@ import Dashboard from './pages/Dashboard.jsx'
 import CropPrediction from './pages/CropPrediction.jsx'
 import DiseaseDetection from './pages/DiseaseDetection.jsx'
 import Auth from './pages/Auth.jsx' 
-import Signup from './pages/Signup';
-import Profile from './pages/Profile';
+import Signup from './pages/SignUp.jsx';
+import Profile from './pages/Profile.jsx';
 import { AuthContext } from './context/AuthContext';
 
 // ProtectedRoute component ensures that only authenticated users can access certain routes.
 const ProtectedRoute = ({ children }) => {
-  const { user } = useContext(AuthContext);
+  const { user, authReady } = useContext(AuthContext);
+
+  if (!authReady) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#f4f9f6] text-gray-600 font-medium">
+        Restoring your session...
+      </div>
+    );
+  }
   
   // If user is not logged in, redirect to login page
   if (!user) {

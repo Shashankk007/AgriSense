@@ -7,7 +7,7 @@ import { AuthContext } from '../context/AuthContext';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 
-const MapDrawer = () => {
+const MapDrawer = ({ farmName = 'My Farm', onFarmSaved }) => {
   const [mapLoaded, setMapLoaded] = useState(false);
   const [featureGroupInstance, setFeatureGroupInstance] = useState(null);
   
@@ -39,8 +39,9 @@ const MapDrawer = () => {
 
     try {
       // API call to save the boundary securely in the database
-      const saved = await saveFarmBoundaryAPI("My Farm", coordinates);
+      const saved = await saveFarmBoundaryAPI(farmName, coordinates);
       console.log('Boundary saved API Response:', saved);
+      onFarmSaved?.(saved.farm || saved.data || saved);
       alert("✅ Farm boundary securely saved to database!");
     } catch (err) {
       console.error('Failed to save boundary:', err);

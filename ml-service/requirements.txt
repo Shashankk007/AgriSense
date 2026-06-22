@@ -1,0 +1,5 @@
+fastapi==0.114.1
+uvicorn[standard]==0.30.6
+earthengine-api==1.7.31
+pymongo==4.8.0
+python-dotenv==1.0.1

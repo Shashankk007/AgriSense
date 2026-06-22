@@ -1,1 +1,27 @@
-.DS_Store
+
+client/
+
+
+# Node dependencies
+backend/node_modules/
+backend/npm-debug.log*
+backend/yarn-debug.log*
+backend/yarn-error.log*
+
+# Backend Environment Variables 
+backend/.env
+
+
+# Python virtual environments
+ml-service/.venv/
+ml-service/env/
+ml-service/venv/
+
+# Python caching
+ml-service/__pycache__/
+ml-service/**/*.py[cod]
+ml-service/*$py.class
+
+# ML-Service Environment Variables & Sensitive Credentials
+ml-service/.env
+ml-service/private-key.json

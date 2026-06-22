@@ -1,7 +1,4 @@
 
-client/
-
-
 # Node dependencies
 backend/node_modules/
 backend/npm-debug.log*

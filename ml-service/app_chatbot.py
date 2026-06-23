@@ -1,25 +1,52 @@
-import os
+from __future__ import annotations
+
+"""
+AgriSense ML Service — FastAPI Application Entry Point
+========================================================
+
+Purpose:
+    The single entry point for the entire ML service. Defines all HTTP
+    endpoints, middleware, and the application lifecycle (startup/shutdown).
+
+Why it exists:
+    This is the ONLY file that deals with HTTP concerns (requests, responses,
+    status codes, CORS). All business logic is delegated to the services layer.
+
+Interactions:
+    - Delegates to: chatbot/services/chat_service.py (chat logic)
+    - Delegates to: chatbot/services/knowledge_service.py (knowledge upload)
+    - Delegates to: chatbot/memory/long_term.py (memory storage)
+    - Uses:         chatbot/models/schemas.py (request/response validation)
+    - Uses:         chatbot/config/settings.py (configuration)
+    - Uses:         chatbot/utils/logger.py (logging)
+
+Run with:
+    cd ml-service
+    .\\venv\\Scripts\\activate
+    uvicorn app:app --host 0.0.0.0 --port 8000 --reload
+"""
+
 import time
 from contextlib import asynccontextmanager
 from typing import Optional
 
-from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pymongo import MongoClient
 
-# --- NDVI Service Imports ---
-from gee.gee_init import initialize_gee
-from services.ndvi_service import NDVIService
-
-# --- Chatbot Service Imports ---
 from chatbot.config.settings import get_settings
 from chatbot.memory.conversation import ConversationMemory
 from chatbot.memory.long_term import LongTermMemory
 from chatbot.models.schemas import (
-    ChatRequest, ChatResponse, HealthResponse, KnowledgeUploadRequest,
-    KnowledgeUploadResponse, MemoryItem, MemoryStoreRequest,
-    MemoryStoreResponse, MemoryResponse,
+    ChatRequest,
+    ChatResponse,
+    HealthResponse,
+    KnowledgeUploadRequest,
+    KnowledgeUploadResponse,
+    MemoryItem,
+    MemoryStoreRequest,
+    MemoryStoreResponse,
+    MemoryResponse,
 )
 from chatbot.retrievers.knowledge import KnowledgeRetriever
 from chatbot.retrievers.memory import MemoryRetriever
@@ -28,37 +55,30 @@ from chatbot.services.knowledge_service import KnowledgeService
 from chatbot.vectorstore.mongo_vector import MongoVectorStore
 from chatbot.utils.logger import get_logger
 
-load_dotenv()
 logger = get_logger(__name__)
 
 # ===================================================================
 # Global service instances — initialized at startup, used by endpoints
 # ===================================================================
-# Chatbot globals
 mongo_client: Optional[MongoClient] = None
 chat_service: Optional[ChatService] = None
 knowledge_service: Optional[KnowledgeService] = None
 long_term_memory: Optional[LongTermMemory] = None
 
-# NDVI globals
-ndvi_service: Optional[NDVIService] = None
-gee_ready = False
-gee_error = ""
 
 # ===================================================================
 # Application Lifecycle (startup / shutdown)
 # ===================================================================
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """
     Manages application lifecycle:
-    - Startup: connect to MongoDB, initialize all services (Chatbot + NDVI).
+    - Startup: connect to MongoDB, initialize all services.
     - Shutdown: close MongoDB connection.
     """
     global mongo_client, chat_service, knowledge_service, long_term_memory
-    global ndvi_service, gee_ready, gee_error
-    
     settings = get_settings()
 
     # --- Startup ---
@@ -68,22 +88,25 @@ async def lifespan(app: FastAPI):
 
     # 1. Connect to MongoDB
     try:
-        # Use settings for URI or fallback to env for NDVI compatibility
-        uri = settings.MONGODB_URI or os.getenv("MONGO_URI", "mongodb://localhost:27017/agrisense")
-        mongo_client = MongoClient(uri)
+        mongo_client = MongoClient(settings.MONGODB_URI)
         mongo_client.admin.command("ping")
         logger.info("✅ MongoDB connected successfully!")
     except Exception as e:
         logger.error("❌ MongoDB connection failed: %s", str(e))
         raise
 
-    # 2. Initialize Chatbot modules
+    # 2. Initialize memory modules
     conversation_memory = ConversationMemory(mongo_client)
     long_term_memory = LongTermMemory(mongo_client)
+
+    # 3. Initialize vector store
     vector_store = MongoVectorStore(mongo_client)
+
+    # 4. Initialize retrievers
     knowledge_retriever = KnowledgeRetriever(vector_store)
     memory_retriever = MemoryRetriever(long_term_memory)
-    
+
+    # 5. Initialize services (dependency injection)
     chat_service = ChatService(
         conversation_memory=conversation_memory,
         long_term_memory=long_term_memory,
@@ -91,23 +114,6 @@ async def lifespan(app: FastAPI):
         memory_retriever=memory_retriever,
     )
     knowledge_service = KnowledgeService(vector_store)
-    logger.info("✅ Chatbot services initialized!")
-
-    # 3. Initialize NDVI Modules
-    try:
-        mongo_db_name = os.getenv("MONGO_DB_NAME", "agrisense")
-        farm_collection = os.getenv("MONGO_FARM_COLLECTION", "farms")
-        mongo_db = mongo_client[mongo_db_name]
-        ndvi_service = NDVIService(mongo_db, farm_collection)
-        
-        init_mode = initialize_gee()
-        gee_ready = True
-        gee_error = ""
-        logger.info(f"✅ Google Earth Engine initialized ({init_mode})")
-    except Exception as exc:
-        gee_ready = False
-        gee_error = str(exc)
-        logger.error(f"❌ Google Earth Engine initialization deferred: {gee_error}")
 
     logger.info("✅ All services initialized!")
 
@@ -119,13 +125,14 @@ async def lifespan(app: FastAPI):
         mongo_client.close()
         logger.info("MongoDB connection closed.")
 
+
 # ===================================================================
 # FastAPI App Instance
 # ===================================================================
 
 app = FastAPI(
-    title="AgriSense AI & NDVI Service",
-    description="Production-ready Agriculture AI Chatbot with RAG, Memory, Knowledge Base and NDVI processing.",
+    title="AgriSense AI Service",
+    description="Production-ready Agriculture AI Chatbot with RAG, Memory, and Knowledge Base",
     version="1.0.0",
     lifespan=lifespan,
 )
@@ -137,16 +144,17 @@ app.add_middleware(
         "http://localhost:5173",
         "http://localhost:5176",
         "http://localhost:3000",
-        os.getenv("CORS_ORIGIN", "http://localhost:5173")
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+
 # ===================================================================
 # Request Logging Middleware
 # ===================================================================
+
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
@@ -164,40 +172,22 @@ async def log_requests(request: Request, call_next):
     )
     return response
 
+
 # ===================================================================
 # Endpoints
 # ===================================================================
 
+
 # ---- Health Check ----
 
 @app.get("/", response_model=HealthResponse, tags=["Health"])
-async def root_health_check():
+async def health_check():
     """
-    Health check endpoint (Chatbot).
+    Health check endpoint.
     Returns service status, name, and version.
     """
     return HealthResponse()
 
-@app.get("/health", tags=["Health"])
-def health_check():
-    """
-    Health check endpoint (NDVI Service).
-    """
-    return {"status": "ok"}
-
-# ---- NDVI ----
-
-@app.get("/ndvi/{farm_id}", tags=["NDVI"])
-def get_ndvi(farm_id: str):
-    if not gee_ready:
-        raise HTTPException(
-            status_code=503,
-            detail=(
-                "Google Earth Engine is not initialized. "
-                f"{gee_error}"
-            ),
-        )
-    return ndvi_service.compute_ndvi(farm_id)
 
 # ---- Chat ----
 
@@ -221,6 +211,7 @@ async def chat(request: ChatRequest):
             detail=f"An error occurred while processing your message: {str(e)}",
         )
 
+
 # ---- Knowledge ----
 
 @app.post("/knowledge/upload", response_model=KnowledgeUploadResponse, tags=["Knowledge"])
@@ -240,6 +231,7 @@ async def upload_knowledge(request: KnowledgeUploadRequest):
             status_code=500,
             detail=f"Failed to upload knowledge: {str(e)}",
         )
+
 
 # ---- Memory ----
 
@@ -267,6 +259,7 @@ async def store_memory(request: MemoryStoreRequest):
             status_code=500,
             detail=f"Failed to store memory: {str(e)}",
         )
+
 
 @app.get("/memory/{user_id}", response_model=MemoryResponse, tags=["Memory"])
 async def get_memories(user_id: str):

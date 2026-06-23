@@ -3,3 +3,14 @@ uvicorn[standard]==0.30.6
 earthengine-api==1.7.31
 pymongo==4.8.0
 python-dotenv==1.0.1
+
+# --- Chatbot Dependencies ---
+langchain
+langchain-core
+langchain-community
+langchain-google-genai
+langchain-mongodb
+langchain-text-splitters
+pydantic
+pydantic-settings
+python-multipart

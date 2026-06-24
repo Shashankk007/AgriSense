@@ -41,14 +41,14 @@ const Navbar = () => {
                 />
               ) : (
                 <div className="w-10 h-10 bg-pink-500 rounded-full flex items-center justify-center text-white font-bold hover:ring-4 hover:ring-pink-100 transition-all">
-                  {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                  {user.fullName ? user.fullName.charAt(0).toUpperCase() : 'U'}
                 </div>
               )}
 
               {/* Hover Dropdown Menu */}
               <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-100 rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
                 <div className="p-4 border-b border-gray-50">
-                  <p className="font-semibold text-gray-800 truncate">{user.name}</p>
+                  <p className="font-semibold text-gray-800 truncate">{user.fullName}</p>
                   <p className="text-xs text-gray-500 truncate">{user.email}</p>
                 </div>
                 <button 

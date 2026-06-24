@@ -6,40 +6,30 @@ import { googleLoginAPI, registerAPI } from '../api/farmApi';
 
 const Signup = () => {
   const navigate = useNavigate();
-  const { setUser } = useContext(AuthContext); // Get setUser from memory
-  const [isLoading, setIsLoading] = useState(false); // UI loading state
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-
-  const buildUsername = () => {
-    const firstPart = `${firstName}${lastName}`
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '');
-    const emailPart = email
-      .split('@')[0]
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '');
-    const base = firstPart || emailPart || 'farmer';
-    return `${base}_${Date.now().toString().slice(-6)}`;
-  };
+  const { setUser } = useContext(AuthContext); 
+  const [isLoading, setIsLoading] = useState(false); 
+  
+  // Updated States according to new Schema
+  const [fullName, setFullName] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [pin, setPin] = useState('');
+  const [email, setEmail] = useState(''); // Optional
+  const [showPin, setShowPin] = useState(false); // Toggle for Eye Icon
 
   // Secure Google Auth handler
   const handleSuccess = async (credentialResponse) => {
     setIsLoading(true);
     try {
-      // Send token to backend for secure HttpOnly cookie
       const data = await googleLoginAPI(credentialResponse.credential);
       if (data.success) {
         setUser({
           id: data.user.id,
-          name: data.user.username || data.user.name,
-          email: data.user.email,
+          name: data.user.fullName || data.user.name,
+          phoneNumber: data.user.phoneNumber,
           picture: data.user.profileImage,
           profileImage: data.user.profileImage,
-        }); // Store in React state
-        navigate('/workspace'); // Redirect to dashboard
+        }); 
+        navigate('/workspace'); 
       }
     } catch (error) {
       console.error("Signup failed:", error);
@@ -54,13 +44,24 @@ const Signup = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const normalizedEmail = email.trim().toLowerCase();
-      const username = buildUsername();
+      // Create payload matching the new schema
+      const payload = { 
+        fullName: fullName.trim(), 
+        phoneNumber: phoneNumber.trim(), 
+        password: pin 
+      };
+      
+      // Add email only if user filled it
+      if (email) {
+        payload.email = email.trim().toLowerCase();
+      }
 
-      const data = await registerAPI({ username, email: normalizedEmail, password });
+      const data = await registerAPI(payload);
       setUser({
         id: data.id,
-        name: data.username,
+        fullName: data.fullName || data.username || data.name, 
+        name: data.fullName || data.username || data.name, // 👈 Sidebar ke liye
+        phoneNumber: data.phoneNumber,
         email: data.email,
         picture: data.profileImage,
         profileImage: data.profileImage,
@@ -90,35 +91,89 @@ const Signup = () => {
 
         {/* Manual Signup Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1.5">First Name</label>
-              <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all text-sm" placeholder="Ramesh" required />
+          
+          {/* Full Name */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+              Full Name <span className="text-red-500">*</span>
+            </label>
+            <input 
+              type="text" 
+              value={fullName} 
+              onChange={(e) => setFullName(e.target.value)} 
+              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all text-sm" 
+              placeholder="Ramesh Kumar" 
+              required 
+            />
+          </div>
+
+          {/* Mobile Number */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+              Mobile Number <span className="text-red-500">*</span>
+            </label>
+            <input 
+              type="tel" 
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all text-sm" 
+              placeholder="9876543210" 
+              pattern="[0-9]{10}" 
+              title="Please enter a valid 10-digit mobile number"
+              required 
+            />
+          </div>
+
+          {/* 4-Digit PIN with Eye Icon */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+              Create 4-Digit PIN <span className="text-red-500">*</span>
+            </label>
+            <div className="relative">
+              <input 
+                type={showPin ? "text" : "password"} 
+                value={pin} 
+                onChange={(e) => setPin(e.target.value)} 
+                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all text-sm pr-10" 
+                placeholder="1234" 
+                maxLength="4"
+                pattern="\d{4}"
+                title="Please enter exactly 4 numbers"
+                required 
+              />
+              <button 
+                type="button" 
+                onClick={() => setShowPin(!showPin)} 
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-green-600 focus:outline-none"
+              >
+                {showPin ? (
+                  // Eye Open Icon
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                ) : (
+                  // Eye Closed Icon
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                  </svg>
+                )}
+              </button>
             </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1.5">Last Name</label>
-              <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all text-sm" placeholder="Kumar" required />
-            </div>
           </div>
 
+          {/* Optional Email */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Mobile Number</label>
-            <input type="tel" className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all text-sm" placeholder="+91 9876543210" pattern="[0-9+\s-]+" required />
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Email Address</label>
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all text-sm" placeholder="farmer@agrisense.com" required />
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Full Address</label>
-            <textarea rows="3" className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all text-sm resize-none" placeholder="Enter your farm or home address..." required ></textarea>
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Create Password</label>
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all text-sm" placeholder="••••••••" minLength="6" required />
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+              Email Address <span className="text-gray-400 font-normal text-xs">(Optional)</span>
+            </label>
+            <input 
+              type="email" 
+              value={email} 
+              onChange={(e) => setEmail(e.target.value)} 
+              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all text-sm" 
+              placeholder="farmer@agrisense.com" 
+            />
           </div>
 
           <button type="submit" className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl transition-all hover:-translate-y-0.5 shadow-sm mt-4" disabled={isLoading}>

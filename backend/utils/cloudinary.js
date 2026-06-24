@@ -1,11 +1,18 @@
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
 
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET
-});
+let isConfigured = false;
+
+const ensureCloudinaryConfig = () => {
+    if (!isConfigured) {
+        cloudinary.config({
+            cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+            api_key: process.env.CLOUDINARY_API_KEY,
+            api_secret: process.env.CLOUDINARY_API_SECRET
+        });
+        isConfigured = true;
+    }
+};
 
 const uploadOnCloudinary = async (
     localFilePath,
@@ -13,6 +20,9 @@ const uploadOnCloudinary = async (
 ) => {
     try {
         if (!localFilePath) return null;
+
+        // Ensure cloudinary is configured before uploading
+        ensureCloudinaryConfig();
 
         const response = await cloudinary.uploader.upload(
             localFilePath,
@@ -32,7 +42,10 @@ const uploadOnCloudinary = async (
             fs.unlinkSync(localFilePath);
         }
 
-        console.log("Cloudinary Upload Error:", error);
+        console.error("Cloudinary Upload Error:", error.message || error);
+        if (error.http_code) {
+            console.error("Cloudinary HTTP Code:", error.http_code);
+        }
 
         return null;
     }
@@ -40,5 +53,6 @@ const uploadOnCloudinary = async (
 
 export {
     cloudinary,
+    ensureCloudinaryConfig,
     uploadOnCloudinary
 };

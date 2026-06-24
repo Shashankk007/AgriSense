@@ -1,6 +1,7 @@
 import express from "express";
 import crypto from "crypto";
 import { OAuth2Client } from "google-auth-library";
+import { upload } from '../middlewares/multer.js';
 
 import { User } from "../models/User.js";
 import {
@@ -9,6 +10,9 @@ import {
   logoutUser,
   refreshAccessToken,
   getUser,
+  updateProfile,
+  changePin,
+  changeProfileImage
 } from "../controllers/user-controller.js";
 import { isLoggedIn } from "../middlewares/isLoggerIn.js";
 import wrapAsync from "../utils/wrapAsync.js";
@@ -103,5 +107,8 @@ router.post(
 router.post("/refresh-token", refreshAccessToken);
 router.post("/logout", isLoggedIn, logoutUser);
 router.get("/me", isLoggedIn, getUser);
+router.put("/update-profile", isLoggedIn, updateProfile);
+router.put("/change-pin", isLoggedIn, changePin);
+router.put('/update-profile-image', isLoggedIn, upload.single('profileImage'), changeProfileImage);
 
 export default router;

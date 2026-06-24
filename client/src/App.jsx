@@ -5,10 +5,12 @@ import Layout from './pages/Layout.jsx'
 import Dashboard from './pages/Dashboard.jsx'
 import CropPrediction from './pages/CropPrediction.jsx'
 import DiseaseDetection from './pages/DiseaseDetection.jsx'
-import Auth from './pages/Auth.jsx' 
+import Login from './pages/login.jsx' 
 import Signup from './pages/SignUp.jsx';
 import Profile from './pages/Profile.jsx';
 import { AuthContext } from './context/AuthContext';
+import DetectionHistory from './pages/DetectionHistory.jsx';
+import { Toaster } from 'react-hot-toast'; 
 
 // ProtectedRoute component ensures that only authenticated users can access certain routes.
 const ProtectedRoute = ({ children }) => {
@@ -33,10 +35,11 @@ const ProtectedRoute = ({ children }) => {
 const App = () => {
   return (
     <div className="text-gray-800 font-sans selection:bg-green-200">
+      <Toaster position="top-right" reverseOrder={false} />
       <Routes>
         {/* Main Public Landing Page */}
         <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Auth />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         {/* Nested AI Tooling Workspace Routes */}
         <Route path="/workspace" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
@@ -44,6 +47,7 @@ const App = () => {
           <Route path="crop-prediction" element={<CropPrediction />} />
           <Route path="disease-detection" element={<DiseaseDetection />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="detection-history" element={<DetectionHistory />} />
         </Route>
       </Routes>
     </div>

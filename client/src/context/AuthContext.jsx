@@ -14,10 +14,13 @@ export const AuthProvider = ({ children }) => {
     const bootstrapAuth = async () => {
       try {
         const data = await getCurrentUserAPI();
-        if (isMounted) {
-          setUser({
+        if (isMounted && data) { // 'data' exist karta hai tabhi set karega
+          // 🟢 BUG FIXED: phoneNumber add kar diya hai
+         setUser({
             id: data._id || data.id,
-            name: data.username || data.name,
+            fullName: data.fullName || data.name,
+            name: data.fullName || data.name,    // 👈 YAHAN ADD KIYA: Taki Sidebar hamesha name dikhaye
+            phoneNumber: data.phoneNumber,
             email: data.email,
             picture: data.profileImage,
             profileImage: data.profileImage,

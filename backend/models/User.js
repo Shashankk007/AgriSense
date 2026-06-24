@@ -4,37 +4,48 @@ import jwt from "jsonwebtoken";
 
 const userSchema = new mongoose.Schema(
   {
-    username: {
+    fullName: {
+      type: String,
+      required: true,
+      trim: true, // Aage-peeche ke extra spaces hata dega
+    },
+
+    phoneNumber: {
       type: String,
       required: true,
       unique: true,
+      match: [/^\d{10}$/, "Please enter a valid 10-digit mobile number"], // Sirf 10 digit allow karega
     },
-
+    email: {
+            type: String,
+            required: false, // Optional kar diya
+            unique: true, 
+            sparse: true, // 🚨 MAGIC KEYWORD: Agar email nahi hai, toh duplicate error nahi dega
+            lowercase: true,
+            trim: true,
+        },
     password: {
       type: String,
-      required: true,
+      required: true, // Frontend par farmer ko bolna ki 4-digit PIN dale (e.g., 1234)
     },
 
-    email: {
-      type:String,
-      required:true,
-      unique:true,
-      lowercase:true
-      
+    language: {
+      type: String,
+      enum: ["hi", "en", "mr", "pa", "ta", "te"], // Hindi, English, Marathi, Punjabi, Tamil, Telugu
+      default: "hi", // Default Hindi rakha hai
     },
 
     profileImage: {
       type: String,
       default: "https://cdn-icons-png.flaticon.com/512/1326/1326382.png",
     },
-    
 
-    role:{
-        type:String,
-        enum:["farmer","admin","expert"],
-        default:"farmer"
+    role: {
+      type: String,
+      enum: ["farmer", "admin", "expert"],
+      default: "farmer",
     },
-    
+
     refreshToken: {
       type: String,
     },
@@ -42,43 +53,38 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-//here we are hashing the password before saving it to the database
-
-userSchema.pre("save", async function () {
+// Password hashing before saving
+userSchema.pre("save", async function (next) {
   if (this.isModified("password")) {
-    // Hash only if the password is modified
     this.password = await bcrypt.hash(this.password, 12);
   }
 });
 
-//we use methods to create a method for the schema
-//here it  checks if given password matches with pass in database
+// Compare password/PIN
 userSchema.methods.matchPassword = async function (enteredPassword) {
-  const isMatch = await bcrypt.compare(enteredPassword, this.password);
-  return isMatch;
+  return await bcrypt.compare(enteredPassword, this.password);
 };
 
-// Create JWT Token
-//const token = jwt.sign({ userId: user.id }, SECRET_KEY, { expiresIn: '1h' });
-
+// Generate Access Token (Email hata kar phoneNumber add kiya hai)
 userSchema.methods.generateAccessToken = function () {
   return jwt.sign(
     {
-      id: this._id, //this is payload or we say data
-      username: this.username,
-      email: this.email,
+      id: this._id,
+      fullName: this.fullName,
+      phoneNumber: this.phoneNumber,
     },
-    process.env.ACCESS_TOKEN_SECRET, //this is secret key
+    process.env.ACCESS_TOKEN_SECRET,
     {
-      expiresIn: process.env.ACCESS_TOKEN_EXPIRY, //this is expiry time
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
     }
   );
 };
 
+// Generate Refresh Token
 userSchema.methods.generateRefreshToken = function () {
   return jwt.sign(
     {
-      id: this._id, //this is payload or we say data
+      id: this._id,
     },
     process.env.REFRESH_TOKEN_SECRET,
     {

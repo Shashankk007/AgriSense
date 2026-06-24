@@ -2,6 +2,12 @@ import mongoose from "mongoose";
 
 const diseaseDetectionSchema = new mongoose.Schema(
 {
+    user:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"User",
+        required:true
+    },
+
     farmId:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Farm"
@@ -16,6 +22,9 @@ const diseaseDetectionSchema = new mongoose.Schema(
         type:String,
         required:true
     },
+
+    cloudinaryId: String,
+
 
     crop:String,
 

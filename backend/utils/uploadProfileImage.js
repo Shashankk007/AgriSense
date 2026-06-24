@@ -1,15 +1,12 @@
 import { uploadOnCloudinary } from "./cloudinary.js";
 
-const uploadProfileImage = async (req) => {
-
-    const avatarLocalPath = req.file?.path;
-
-    if (!avatarLocalPath) {
+const uploadProfileImage = async (localFilePath) => {
+    if (!localFilePath) {
         throw new Error("Profile image is required");
     }
 
     const avatar = await uploadOnCloudinary(
-        avatarLocalPath,
+        localFilePath,
         "agrisense/profile-images"
     );
 
@@ -17,7 +14,10 @@ const uploadProfileImage = async (req) => {
         throw new Error("Failed to upload profile image");
     }
 
-    return avatar.secure_url;
+    return {
+        public_id: avatar.public_id,
+        url: avatar.secure_url
+    };
 };
 
 export default uploadProfileImage;

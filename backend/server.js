@@ -6,6 +6,7 @@ import helmet from "helmet";
 
 import farmRoutes from "./routes/farmRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
+import detectionRoutes from "./routes/detectionRoutes.js";
 import {connectDb} from "./utils/db.js";
 import apiError from "./utils/apiError.js";
 dotenv.config();
@@ -30,6 +31,7 @@ app.use(cookieParser());
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/farms", farmRoutes);
+app.use("/api/detection", detectionRoutes);
 
 // Handle unknown routes (use middleware to avoid path token parsing issues)
 app.use((req, res, next) => {

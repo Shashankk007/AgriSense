@@ -1,10 +1,9 @@
 import wrapAsync from "../utils/wrapAsync.js";
 import {User} from "../models/User.js";
-import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { v2 as cloudinary } from "cloudinary";
 import apiError from "../utils/apiError.js";
 import uploadProfileImage from "../utils/uploadProfileImage.js";
+import { cloudinary } from "../utils/cloudinary.js";
 
 const authCookieOptions = {
     httpOnly: true,
@@ -16,7 +15,7 @@ const authCookieOptions = {
 const registerUser = wrapAsync(async (req, res) => {
     
 
-    const { username, email, password, profileImage } = req.body;
+    const { username, email, password } = req.body;
 
     // Validate required fields
     if (!username || !email || !password) {
@@ -34,12 +33,13 @@ const registerUser = wrapAsync(async (req, res) => {
     // Upload profileImage if provided
     const profileImageLocalPath = req.file?.path;
 
-    let profileImageUrl = "";
+    let profileImageUrl;
     if (profileImageLocalPath) {
         try {
-            profileImageUrl = await uploadProfileImage(profileImageLocalPath);
+            const uploadedProfileImage = await uploadProfileImage(profileImageLocalPath);
+            profileImageUrl = uploadedProfileImage.url;
         } catch (error) {
-            throw new apiError(500, "profileImage upload failed", error);
+            throw new apiError(500, error.message || "profileImage upload failed");
         }
     }
 
@@ -208,19 +208,27 @@ const changeProfileImage = wrapAsync(async (req, res) => {
     //deleting old avatar first
     const user = await User.findById(req.user.id).select("-password");
     const userProfileImage = user.profileImage;
-    if(userProfileImage){
-        const publicId = userProfileImage.split('/').pop().split('.')[0]; // Extract public ID from URL
-        await cloudinary.uploader.destroy(`agrisense/profile-images/${publicId}`); // Delete old  from Cloudinary
+    if(userProfileImage && userProfileImage.includes("cloudinary.com")){
+        const pathSegments = new URL(userProfileImage).pathname.split("/");
+        const uploadIndex = pathSegments.findIndex((segment) => segment === "upload");
+        const publicIdWithExtension = pathSegments
+            .slice(uploadIndex + 2)
+            .join("/");
+        const publicId = publicIdWithExtension.replace(/\.[^/.]+$/, "");
+
+        if (publicId) {
+            await cloudinary.uploader.destroy(publicId);
+        }
     }
 
     // Upload new avatar to Cloudinary
-    const newUrl = await uploadProfileImage(profileImageLocalPath);
-    if (!newUrl) {
+    const uploadedProfileImage = await uploadProfileImage(profileImageLocalPath);
+    if (!uploadedProfileImage?.url) {
         throw new apiError(500, "Profile image upload failed")
     }
 
     // Update user's avatar URL in the database
-    user.profileImage = newUrl;
+    user.profileImage = uploadedProfileImage.url;
     await user.save({ validateBeforeSave: false });
 
     return res

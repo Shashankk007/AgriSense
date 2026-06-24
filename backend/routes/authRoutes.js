@@ -9,8 +9,10 @@ import {
   logoutUser,
   refreshAccessToken,
   getUser,
+  changeProfileImage,
 } from "../controllers/user-controller.js";
 import { isLoggedIn } from "../middlewares/isLoggerIn.js";
+import { upload } from "../middlewares/multer.js";
 import wrapAsync from "../utils/wrapAsync.js";
 import apiError from "../utils/apiError.js";
 
@@ -38,7 +40,7 @@ async function createUniqueUsername(baseUsername) {
 }
 
 router.post("/login", loginUser);
-router.post("/register", registerUser);
+router.post("/register", upload.single("profileImage"), registerUser);
 
 router.post(
   "/google-login",
@@ -103,5 +105,6 @@ router.post(
 router.post("/refresh-token", refreshAccessToken);
 router.post("/logout", isLoggedIn, logoutUser);
 router.get("/me", isLoggedIn, getUser);
+router.patch("/profile-image", isLoggedIn, upload.single("profileImage"), changeProfileImage);
 
 export default router;

@@ -33,18 +33,34 @@ from chatbot.utils.logger import get_logger
 logger = get_logger(__name__)
 
 
-def get_llm() -> ChatGoogleGenerativeAI:
+from langchain_core.runnables import Runnable
+from langchain_groq import ChatGroq
+
+def get_llm() -> Runnable:
     """
-    Initializes and returns the Gemini LLM instance.
-    Configuration (model name, temperature) comes from centralized settings.
+    Initializes and returns the LLM instance with fallback support.
+    If GROQ_API_KEY is set, it uses Groq as primary, and Google as fallback.
     """
     settings = get_settings()
-    return ChatGoogleGenerativeAI(
+    
+    fallback_llm = ChatGoogleGenerativeAI(
         model=settings.LLM_MODEL,
         google_api_key=settings.GOOGLE_API_KEY,
         temperature=settings.LLM_TEMPERATURE,
         convert_system_message_to_human=True,
     )
+    
+    if settings.GROQ_API_KEY:
+        logger.info("Configuring LLM with Groq as primary, Google as fallback.")
+        # We use a standard Groq model for chat, e.g., llama-3.3-70b-versatile
+        primary_llm = ChatGroq(
+            model_name="llama-3.3-70b-versatile",
+            groq_api_key=settings.GROQ_API_KEY,
+            temperature=settings.LLM_TEMPERATURE,
+        )
+        return primary_llm.with_fallbacks([fallback_llm])
+        
+    return fallback_llm
 
 
 async def run_chat_chain(

@@ -30,6 +30,9 @@ class Settings(BaseSettings):
     # ---- Google Gemini ----
     GOOGLE_API_KEY: str
 
+    # ---- Groq ----
+    GROQ_API_KEY: str | None = None
+
     # ---- MongoDB Atlas ----
     MONGODB_URI: str
     DATABASE_NAME: str = "agrisense_ai"

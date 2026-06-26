@@ -11,6 +11,7 @@ import Profile from './pages/Profile.jsx';
 import { AuthContext } from './context/AuthContext';
 import DetectionHistory from './pages/DetectionHistory.jsx';
 import { Toaster } from 'react-hot-toast'; 
+import ChatbotWidget from './components/ChatbotWidget';
 
 // ProtectedRoute component ensures that only authenticated users can access certain routes.
 const ProtectedRoute = ({ children }) => {
@@ -50,6 +51,7 @@ const App = () => {
           <Route path="detection-history" element={<DetectionHistory />} />
         </Route>
       </Routes>
+      <ChatbotWidget />
     </div>
   )
 }

@@ -129,7 +129,7 @@ const logoutUser = wrapAsync(async(req, res) => {
             }
         },
         {
-            new: true // returns the updated document
+            returnDocument: 'after' // returns the updated document
         }
     )
 
@@ -318,7 +318,7 @@ const updateProfile = wrapAsync(async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(
         userId,
         updateQuery,
-        { new: true, runValidators: false } // 'new: true' humesha naya data return karta hai
+        { returnDocument: 'after', runValidators: false } // 'returnDocument: after' humesha naya data return karta hai
     );
 
     if (!updatedUser) {

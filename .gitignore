@@ -22,3 +22,7 @@ ml-service/*$py.class
 # ML-Service Environment Variables & Sensitive Credentials
 ml-service/.env
 ml-service/private-key.json
+
+# Chatbot Documentation (Ignore from git)
+ml-service/chatbot_documentation.md
+ml-service/implementation_plan.md

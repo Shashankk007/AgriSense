@@ -63,25 +63,36 @@ export const detectDisease = wrapAsync(async (req, res) => {
 
     const imageUrlsForML = cloudinaryResults.map(img => img.secure_url);
 
-    // 5. FastAPI / Dummy ML Execution
+    // 5. FastAPI / ML Execution
     let mlPredictions = [];
     try {
-        const FAST_API_URL = process.env.FAST_API_URL || "http://localhost:8000/predict";
+        const FAST_API_URL = process.env.FAST_API_URL || "http://localhost:8000";
         
-        // Mocking API predictions format structure mirroring standard formats
-        mlPredictions = cloudinaryResults.map((_, index) => ({
-            diseaseName: index === 0 ? "Tomato Late Blight" : "Healthy",
-            confidenceScore: index === 0 ? 94.5 : 99.1,
-            isHealthy: index !== 0,
-            severity: index === 0 ? "High" : "None",
-            diseaseType: index === 0 ? "Fungal" : "None",
-            affectedPart: "Leaf",
-            cause: index === 0 ? "Phytophthora infestans" : "None",
-            precautions: index === 0 ? ["Remove infected leaves", "Avoid overhead watering"] : ["Maintain current schedule"],
-            treatments: index === 0 ? ["Apply copper-based fungicide"] : ["None"]
+        mlPredictions = await Promise.all(imageUrlsForML.map(async (url) => {
+            try {
+                const response = await axios.post(`${FAST_API_URL}/predict/disease`, { image_url: url });
+                const { prediction } = response.data;
+                const details = prediction.details || {};
+                
+                return {
+                    diseaseName: prediction.class || "Unknown",
+                    confidenceScore: prediction.confidence_score || 0,
+                    isHealthy: prediction.class === "Healthy",
+                    severity: details.severity || "None",
+                    diseaseType: details.disease_type || "Unknown",
+                    affectedPart: details.affected_part || "Leaf",
+                    cause: details.cause || "Unknown",
+                    precautions: details.prevention ? [details.prevention] : [],
+                    treatments: details.solution ? [details.solution] : []
+                };
+            } catch (err) {
+                console.error("FastAPI Error for URL:", url, err.response?.data || err.message);
+                throw new apiError(500, err.response?.data?.detail || "Machine Learning model is not working. Please try again later.");
+            }
         }));
     } catch (error) {
-        console.error("FastAPI Error:", error);
+        console.error("FastAPI Overall Error:", error);
+        if (error.statusCode) throw error;
         throw new apiError(500, "Machine Learning service error");
     }
 
@@ -137,6 +148,95 @@ export const getDetectionHistory = wrapAsync(async (req, res) => {
     return res.status(200).json({
         success: true,
         history
+    });
+});
+
+export const getPestHistory = wrapAsync(async (req, res) => {
+    // Note: PestDetection uses farmId directly, assuming it's linked
+    // However, PestDetection model doesn't explicitly store userId in the snippet provided.
+    // Let's check how PestDetection is saved.
+    // Wait, in detectPest: await PestDetection.create({ farmId: finalFarmId, ... })
+    // If there is no user field, how do we filter? Let's check PestDetection schema later or just find by farmId if possible, but let's assume we can fetch it if we populate.
+    
+    // Query by userId to include both assigned and unassigned (no farm) pest scans
+    const history = await PestDetection.find({ userId: req.user.id })
+        .sort({ createdAt: -1 })
+        .populate("farmId", "farmName");
+
+    return res.status(200).json({
+        success: true,
+        history
+    });
+});
+
+import PestDetection from "../models/PestDetection.js";
+
+export const detectPest = wrapAsync(async (req, res) => {
+    const { farmId, newFarmName, latitude, longitude } = req.body;
+    let finalFarmId = farmId;
+
+    if (!req.files || req.files.length === 0) {
+        throw new apiError(400, "Please upload at least one crop image for detection");
+    }
+
+    if (newFarmName) {
+        const lat = latitude ? parseFloat(latitude) : 20.5937;
+        const lng = longitude ? parseFloat(longitude) : 78.9629;
+        const polygonCoordinates = [
+            [[lng - 0.001, lat - 0.001], [lng + 0.001, lat - 0.001], [lng + 0.001, lat + 0.001], [lng - 0.001, lat + 0.001], [lng - 0.001, lat - 0.001]]
+        ];
+        const newFarm = await Farm.create({
+            userId: req.user.id,
+            farmName: newFarmName,
+            area: { value: 1, unit: "acre" },
+            boundary: { type: "Polygon", coordinates: polygonCoordinates }
+        });
+        finalFarmId = newFarm._id;
+    }
+
+    const cloudinaryUploadPromises = req.files.map(file => uploadOnCloudinary(file.path, "agrisense/pests"));
+    const cloudinaryResults = await Promise.all(cloudinaryUploadPromises);
+
+    const failedUploads = cloudinaryResults.filter(result => result === null);
+    if (failedUploads.length > 0) {
+        throw new apiError(500, "Failed to upload some images to cloud storage");
+    }
+
+    const FAST_API_URL = process.env.FAST_API_URL || "http://localhost:8000";
+    
+    const pestRecords = await Promise.all(cloudinaryResults.map(async (cloudData) => {
+        let pestName = "Unknown";
+        let confidence = 0;
+        let recommendation = "";
+        
+        try {
+            const response = await axios.post(`${FAST_API_URL}/predict/pest`, { image_url: cloudData.secure_url });
+            const { prediction } = response.data;
+            const details = prediction.details || {};
+            
+            pestName = details.pest_name || `Class ${prediction.class}`;
+            confidence = prediction.confidence_score;
+            recommendation = (details.remedies || []).join(" | ");
+        } catch (err) {
+            console.error("FastAPI Pest Error:", err.response?.data || err.message);
+            throw new apiError(500, err.response?.data?.detail || "Pest prediction model is not working. Please try again later.");
+        }
+
+        return await PestDetection.create({
+            userId: req.user.id,
+            farmId: finalFarmId || null,
+            imageUrl: cloudData.secure_url,
+            pestName,
+            confidence,
+            severity: "Medium", // Or detect from details
+            recommendation
+        });
+    }));
+
+    return res.status(200).json({
+        success: true,
+        message: "Pest analysis completed successfully",
+        detectionResult: pestRecords
     });
 });
 

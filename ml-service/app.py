@@ -11,6 +11,7 @@ from pymongo import MongoClient
 # --- NDVI Service Imports ---
 from gee.gee_init import initialize_gee
 from services.ndvi_service import NDVIService
+from services.prediction_service import PredictionService
 
 # --- Chatbot Service Imports ---
 from chatbot.config.settings import get_settings
@@ -47,6 +48,9 @@ ndvi_service: Optional[NDVIService] = None
 gee_ready = False
 gee_error = ""
 
+# Prediction globals
+prediction_service: Optional[PredictionService] = None
+
 # ===================================================================
 # Application Lifecycle (startup / shutdown)
 # ===================================================================
@@ -59,7 +63,7 @@ async def lifespan(app: FastAPI):
     - Shutdown: close MongoDB connection.
     """
     global mongo_client, chat_service, knowledge_service, long_term_memory, history_db
-    global ndvi_service, gee_ready, gee_error
+    global ndvi_service, gee_ready, gee_error, prediction_service
     
     settings = get_settings()
 
@@ -70,9 +74,7 @@ async def lifespan(app: FastAPI):
 
     # 1. Connect to MongoDB
     try:
-        # Use settings for URI or fallback to env for NDVI compatibility
-        uri = settings.MONGODB_URI or os.getenv("MONGO_URI", "mongodb://localhost:27017/agrisense")
-        mongo_client = MongoClient(uri)
+        mongo_client = MongoClient(settings.MONGODB_URI)
         mongo_client.admin.command("ping")
         logger.info("✅ MongoDB connected successfully!")
     except Exception as e:
@@ -99,10 +101,8 @@ async def lifespan(app: FastAPI):
 
     # 3. Initialize NDVI Modules
     try:
-        mongo_db_name = os.getenv("MONGO_DB_NAME", "agrisense")
-        farm_collection = os.getenv("MONGO_FARM_COLLECTION", "farms")
-        mongo_db = mongo_client[mongo_db_name]
-        ndvi_service = NDVIService(mongo_db, farm_collection)
+        mongo_db = mongo_client[settings.MONGO_DB_NAME]
+        ndvi_service = NDVIService(mongo_db, settings.MONGO_FARM_COLLECTION)
         
         init_mode = initialize_gee()
         gee_ready = True
@@ -112,6 +112,13 @@ async def lifespan(app: FastAPI):
         gee_ready = False
         gee_error = str(exc)
         logger.error(f"❌ Google Earth Engine initialization deferred: {gee_error}")
+
+    # 4. Initialize Prediction Service
+    try:
+        prediction_service = PredictionService()
+        logger.info("✅ Prediction Service initialized!")
+    except Exception as e:
+        logger.error(f"❌ Prediction Service failed to initialize: {e}")
 
     logger.info("✅ All services initialized!")
 
@@ -141,7 +148,7 @@ app.add_middleware(
         "http://localhost:5173",
         "http://localhost:5176",
         "http://localhost:3000",
-        os.getenv("CORS_ORIGIN", "http://localhost:5173")
+        get_settings().CORS_ORIGIN,
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -202,6 +209,32 @@ def get_ndvi(farm_id: str):
             ),
         )
     return ndvi_service.compute_ndvi(farm_id)
+
+# ---- Prediction ----
+from pydantic import BaseModel
+
+class PredictionRequest(BaseModel):
+    image_url: str
+
+@app.post("/predict/disease", tags=["Prediction"])
+def predict_disease(request: PredictionRequest):
+    if prediction_service is None:
+        raise HTTPException(status_code=503, detail="Prediction service not initialized")
+    try:
+        result = prediction_service.predict_disease(request.image_url)
+        return {"success": True, "prediction": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/predict/pest", tags=["Prediction"])
+def predict_pest(request: PredictionRequest):
+    if prediction_service is None:
+        raise HTTPException(status_code=503, detail="Prediction service not initialized")
+    try:
+        result = prediction_service.predict_pest(request.image_url)
+        return {"success": True, "prediction": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 # ---- Chat ----
 

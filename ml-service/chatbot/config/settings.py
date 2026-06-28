@@ -36,6 +36,8 @@ class Settings(BaseSettings):
     # ---- MongoDB Atlas ----
     MONGODB_URI: str
     DATABASE_NAME: str = "agrisense_ai"
+    MONGO_DB_NAME: str = "agrisense_ai"
+    MONGO_FARM_COLLECTION: str = "farms"
 
     # ---- Collection Names ----
     KNOWLEDGE_COLLECTION: str = "knowledge_base"
@@ -54,6 +56,14 @@ class Settings(BaseSettings):
 
     # ---- Server ----
     ML_SERVICE_PORT: int = 8000
+    CORS_ORIGIN: str = "http://localhost:5176"
+    ML_DEVICE: str = "cpu"
+
+    # ---- Google Earth Engine ----
+    GEE_INIT_MODE: str = "local"
+    GEE_SERVICE_ACCOUNT: str | None = None
+    GEE_PRIVATE_KEY_FILE: str | None = None
+    GEE_PRIVATE_KEY_JSON: str | None = None
 
     model_config = SettingsConfigDict(
         env_file=".env",

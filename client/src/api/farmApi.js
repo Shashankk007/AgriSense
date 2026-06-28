@@ -112,8 +112,17 @@ export const updateProfileImageAPI = async (formData) => {
 
 //🟢 detect disease api
 export const scanCropImagesAPI = async (formData) => {
-  // Dhyan rahe: multipart/form-data header axios apne aap set kar leta hai jab hum FormData bhejte hain
   const response = await apiClient.post("/detections/scan", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data"
+    }
+  });
+  return response.data;
+};
+
+//🟢 detect pest api
+export const scanPestImagesAPI = async (formData) => {
+  const response = await apiClient.post("/detections/scan-pest", formData, {
     headers: {
       "Content-Type": "multipart/form-data"
     }
@@ -128,6 +137,17 @@ export const getDetectionHistoryAPI = async () => {
     return response.data;
   } catch (error) {
     console.error('Failed to fetch detection history:', error);
+    throw error;
+  }
+};
+
+//🟢 get pestHistory
+export const getPestHistoryAPI = async () => {
+  try {
+    const response = await apiClient.get('/detections/history/pest');
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch pest history:', error);
     throw error;
   }
 };

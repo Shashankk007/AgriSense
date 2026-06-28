@@ -1,22 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { scanCropImagesAPI, getFarmsAPI, getDetectionHistoryAPI } from '../api/farmApi';
+import { scanPestImagesAPI, getFarmsAPI, getPestHistoryAPI } from '../api/farmApi';
 import { useNavigate } from 'react-router-dom';
 
-const DiseaseDetection = () => {
+const PestDetection = () => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [previewUrls, setPreviewUrls] = useState([]);
   const [selectedFarm, setSelectedFarm] = useState("");
   const [isScanning, setIsScanning] = useState(false);
   const [results, setResults] = useState(null);
-
+  
   const [newFarmName, setNewFarmName] = useState("");
   const [isAddingNewFarm, setIsAddingNewFarm] = useState(false);
-  
-  // 🟢 NAYA STATE: Location ko pehle hi save karne ke liye
   const [farmLocation, setFarmLocation] = useState(null);
   const [isLocating, setIsLocating] = useState(false);
-
   const [myFarms, setMyFarms] = useState([]);
   const [recentHistory, setRecentHistory] = useState([]);
   const navigate = useNavigate();
@@ -26,7 +23,7 @@ const DiseaseDetection = () => {
       try {
         const [farmsRes, historyRes] = await Promise.all([
           getFarmsAPI(),
-          getDetectionHistoryAPI()
+          getPestHistoryAPI()
         ]);
         
         if (farmsRes && farmsRes.farms) {
@@ -38,8 +35,8 @@ const DiseaseDetection = () => {
         if (historyRes && historyRes.success) {
           setRecentHistory(historyRes.history.slice(0, 5));
         }
-      } catch (error) {
-        console.error("Failed to load initial data", error);
+      } catch (err) {
+        console.error("Could not fetch initial data", err);
       }
     };
     fetchData();
@@ -60,15 +57,11 @@ const DiseaseDetection = () => {
     setPreviewUrls((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // 🟢 BUG 2 FIX: Dropdown change hote hi turant location maango
   const handleFarmSelect = (e) => {
     const value = e.target.value;
-    
     if (value === "ADD_NEW") {
       setIsAddingNewFarm(true);
       setSelectedFarm("");
-      
-      // Turant location fetch karo
       if (navigator.geolocation) {
         setIsLocating(true);
         navigator.geolocation.getCurrentPosition(
@@ -79,16 +72,16 @@ const DiseaseDetection = () => {
           },
           (error) => {
             setIsLocating(false);
-            toast.error("Location access denied. Using default map settings.");
+            toast.error("Location access denied.");
           }
         );
       } else {
-        toast.error("Geolocation is not supported by your browser.");
+        toast.error("Geolocation not supported.");
       }
     } else {
       setIsAddingNewFarm(false);
       setSelectedFarm(value);
-      setFarmLocation(null); // Purana farm select kiya toh location hata do
+      setFarmLocation(null);
     }
   };
 
@@ -102,8 +95,6 @@ const DiseaseDetection = () => {
 
     try {
       const formData = new FormData();
-      
-      // Agar naya farm add kar rahe hain, toh name aur saved location bhejo
       if (isAddingNewFarm && newFarmName) {
         formData.append("newFarmName", newFarmName);
         if (farmLocation) {
@@ -111,7 +102,6 @@ const DiseaseDetection = () => {
           formData.append("longitude", farmLocation.lng);
         }
       } else if (selectedFarm) {
-        // Purana farm select kiya hai toh sirf ObjectId bhejo
         formData.append("farmId", selectedFarm);
       }
 
@@ -119,12 +109,11 @@ const DiseaseDetection = () => {
         formData.append("cropImages", file);
       });
 
-      const response = await scanCropImagesAPI(formData);
+      const response = await scanPestImagesAPI(formData);
       
       if (response.success) {
-        toast.success("Analysis complete! 🌿");
-        setResults(response.detectionResult.images);
-        // Form reset
+        toast.success("Analysis complete! 🐛");
+        setResults(response.detectionResult);
         setNewFarmName("");
         setIsAddingNewFarm(false);
         setFarmLocation(null);
@@ -141,34 +130,32 @@ const DiseaseDetection = () => {
     <div className="max-w-5xl mx-auto pb-12">
       <div className="mb-8 flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-extrabold text-gray-900">Leaf Disease Scanner</h1>
-          <p className="text-gray-500 mt-2 text-sm sm:text-base">Upload clear images of a plant leaf to detect potential diseases.</p>
+          <h1 className="text-3xl font-extrabold text-gray-900">Pest Attack Scanner</h1>
+          <p className="text-gray-500 mt-2 text-sm sm:text-base">Upload images of infected leaves or bugs to detect pests.</p>
         </div>
         <button 
           onClick={() => navigate('/workspace/detection-history')}
-          className="bg-green-100 hover:bg-green-200 text-green-800 font-bold py-2 px-4 rounded-xl transition-colors flex items-center gap-2"
+          className="bg-orange-100 hover:bg-orange-200 text-orange-800 font-bold py-2 px-4 rounded-xl transition-colors flex items-center gap-2"
         >
           <span>📋</span> View Full History
         </button>
       </div>
 
       <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-200 mb-8">
-        
         {/* FARM SELECTION */}
         <div className="mb-6">
           <label className="block text-sm font-bold text-gray-700 mb-2">Select Farm (Optional)</label>
-          
           {!isAddingNewFarm ? (
             <select 
               value={selectedFarm} 
               onChange={handleFarmSelect}
-              className="w-full sm:w-1/2 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 outline-none text-sm font-medium"
+              className="w-full sm:w-1/2 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 outline-none text-sm font-medium"
             >
               <option value="">-- Select a Farm --</option>
               {myFarms.map(farm => (
                 <option key={farm._id} value={farm._id}>{farm.farmName || farm.name}</option>
               ))}
-              <option value="ADD_NEW" className="font-bold text-green-600">➕ Add New Farm manually</option>
+              <option value="ADD_NEW" className="font-bold text-orange-600">➕ Add New Farm manually</option>
             </select>
           ) : (
             <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-3/4 items-center">
@@ -177,26 +164,15 @@ const DiseaseDetection = () => {
                 placeholder="Enter new farm name..." 
                 value={newFarmName}
                 onChange={(e) => setNewFarmName(e.target.value)}
-                className="flex-1 px-4 py-3 bg-white border border-green-300 rounded-xl focus:ring-2 focus:ring-green-500 outline-none text-sm font-medium"
+                className="flex-1 px-4 py-3 bg-white border border-orange-300 rounded-xl focus:ring-2 focus:ring-orange-500 outline-none text-sm font-medium"
               />
-              
-              {/* Location Indicator */}
               <div className="text-sm font-medium flex items-center">
-                {isLocating ? (
-                  <span className="text-orange-500 animate-pulse">📍 Fetching location...</span>
-                ) : farmLocation ? (
-                  <span className="text-green-600">✅ Location Set</span>
-                ) : (
-                  <span className="text-gray-400">📍 No Location</span>
-                )}
+                {isLocating ? <span className="text-orange-500 animate-pulse">📍 Fetching location...</span> : farmLocation ? <span className="text-green-600">✅ Location Set</span> : <span className="text-gray-400">📍 No Location</span>}
               </div>
-
               <button 
                 onClick={() => { setIsAddingNewFarm(false); setNewFarmName(""); setFarmLocation(null); }}
                 className="text-sm font-bold text-gray-500 hover:text-red-500 transition-colors ml-2"
-              >
-                Cancel
-              </button>
+              >Cancel</button>
             </div>
           )}
         </div>
@@ -228,85 +204,44 @@ const DiseaseDetection = () => {
           </div>
         )}
 
-        {/* SCAN BUTTON */}
         <div className="mt-8 flex justify-end">
           <button 
             onClick={handleScan}
             disabled={isScanning || selectedFiles.length === 0 || isLocating}
-            className="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-md"
+            className="bg-orange-600 hover:bg-orange-700 disabled:bg-gray-400 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-md"
           >
-            {isScanning ? "Analyzing Crop..." : "Scan Images"}
+            {isScanning ? "Analyzing Pests..." : "Scan Images"}
           </button>
         </div>
       </div>
 
-     {/* RESULTS SECTION */}
       {results && results.length > 0 && (
         <div className="space-y-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Analysis Results</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Pest Analysis Results</h2>
           {results.map((item, index) => (
-            <div key={index} className="bg-[#eefcf4] border border-green-200 p-6 rounded-3xl flex flex-col md:flex-row gap-6 shadow-sm">
-              
-              <div className="w-full md:w-48 h-48 rounded-2xl overflow-hidden shrink-0 border border-green-100 bg-white">
-                <img src={item.cloudinaryUrl} alt="Analyzed" className="w-full h-full object-cover" />
+            <div key={index} className="bg-[#fff9eb] border border-orange-200 p-6 rounded-3xl flex flex-col md:flex-row gap-6 shadow-sm">
+              <div className="w-full md:w-48 h-48 rounded-2xl overflow-hidden shrink-0 border border-orange-100 bg-white">
+                <img src={item.imageUrl} alt="Analyzed" className="w-full h-full object-cover" />
               </div>
               
               <div className="flex-1">
                 <div className="flex justify-between items-start mb-3">
-                  <h3 className="text-2xl font-extrabold text-gray-900">{item.prediction.diseaseName}</h3>
-                  <span className="bg-green-100 text-green-800 text-xs font-bold px-3 py-1.5 rounded-full">
-                    {item.prediction.confidenceScore}% Accuracy
+                  <h3 className="text-2xl font-extrabold text-gray-900">{item.pestName}</h3>
+                  <span className="bg-orange-100 text-orange-800 text-xs font-bold px-3 py-1.5 rounded-full">
+                    {item.confidence}% Accuracy
                   </span>
                 </div>
 
-                {/* 🟢 NEW: Tags for Severity, Disease Type, and Affected Part (Same as History) */}
                 <div className="flex flex-wrap gap-2 mb-3">
-                  <span className={`text-xs font-bold px-2.5 py-1 rounded-md border ${
-                    item.prediction.severity === 'High' ? 'bg-red-50 text-red-700 border-red-200' : 
-                    item.prediction.severity === 'Medium' ? 'bg-orange-50 text-orange-700 border-orange-200' : 
-                    'bg-green-50 text-green-700 border-green-200'
-                  }`}>
-                    {item.prediction.severity !== 'None' ? `${item.prediction.severity} Severity` : 'Healthy'}
+                  <span className="bg-red-50 text-red-700 border border-red-200 text-xs font-bold px-2.5 py-1 rounded-md">
+                    Severity: {item.severity}
                   </span>
-                  
-                  {item.prediction.diseaseType && item.prediction.diseaseType !== "Unknown" && item.prediction.diseaseType !== "None" && (
-                    <span className="bg-purple-50 text-purple-700 border border-purple-200 text-xs font-bold px-2.5 py-1 rounded-md">
-                      Type: {item.prediction.diseaseType}
-                    </span>
-                  )}
-
-                  {item.prediction.affectedPart && (
-                    <span className="bg-blue-50 text-blue-700 border border-blue-200 text-xs font-bold px-2.5 py-1 rounded-md">
-                      Affected Area: {item.prediction.affectedPart}
-                    </span>
-                  )}
                 </div>
 
-                {/* Cause from Schema */}
-                {item.prediction.diseaseName !== "Healthy" && item.prediction.cause && item.prediction.cause !== "None" && (
-                  <p className="text-gray-700 text-sm mb-4">
-                    The AI detected signs of {item.prediction.diseaseName}, primarily caused by <span className="font-semibold italic">{item.prediction.cause}</span>.
-                  </p>
-                )}
-
-                {/* Treatments & Precautions */}
-                {(item.treatments.length > 0 || item.precautions.length > 0) && (
-                  <div className="bg-white rounded-2xl p-5 border border-green-100 shadow-sm mt-2">
-                    <h4 className="text-sm font-extrabold text-gray-900 mb-3 flex items-center gap-2">
-                      💊 Treatment & Action Plan
-                    </h4>
-                    <ul className="space-y-2">
-                      {item.treatments.map((t, i) => (
-                        <li key={`t-${i}`} className="text-sm text-gray-700 flex items-start gap-2">
-                          <span className="text-green-500 font-bold">•</span>{t}
-                        </li>
-                      ))}
-                      {item.precautions.map((p, i) => (
-                        <li key={`p-${i}`} className="text-sm text-gray-700 flex items-start gap-2">
-                          <span className="text-green-500 font-bold">•</span>{p}
-                        </li>
-                      ))}
-                    </ul>
+                {item.recommendation && (
+                  <div className="bg-white rounded-2xl p-5 border border-orange-100 shadow-sm mt-4">
+                    <h4 className="text-sm font-extrabold text-gray-900 mb-2">💡 Recommendations</h4>
+                    <p className="text-sm text-gray-700 leading-relaxed">{item.recommendation}</p>
                   </div>
                 )}
               </div>
@@ -318,26 +253,22 @@ const DiseaseDetection = () => {
       {/* RECENT HISTORY SECTION */}
       {!results && recentHistory.length > 0 && (
         <div className="mt-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b pb-2">Recent Scans</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b pb-2">Recent Pest Scans</h2>
           <div className="space-y-6">
             {recentHistory.map((record) => (
               <div key={record._id} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex flex-col md:flex-row gap-5 items-center">
                 <div className="w-24 h-24 rounded-xl overflow-hidden shrink-0 border border-gray-100 bg-gray-50">
-                  <img src={record.images[0]?.cloudinaryUrl} alt="Recent scan" className="w-full h-full object-cover" />
+                  <img src={record.imageUrl} alt="Recent pest scan" className="w-full h-full object-cover" />
                 </div>
                 <div className="flex-1">
                   <h3 className="text-lg font-bold text-gray-800 mb-1">
-                    {record.images[0]?.prediction?.diseaseName || "Unknown"}
+                    {record.pestName || "Unknown"}
                   </h3>
                   <p className="text-sm text-gray-500 mb-2">
                     {record.farmId?.farmName || "Unassigned Farm"} • {new Date(record.createdAt).toLocaleDateString()}
                   </p>
-                  <span className={`text-xs font-bold px-2 py-1 rounded-md border ${
-                    record.images[0]?.prediction?.severity === 'High' ? 'bg-red-50 text-red-700 border-red-200' : 
-                    record.images[0]?.prediction?.severity === 'Medium' ? 'bg-orange-50 text-orange-700 border-orange-200' : 
-                    'bg-green-50 text-green-700 border-green-200'
-                  }`}>
-                    {record.images[0]?.prediction?.severity !== 'None' ? `${record.images[0]?.prediction?.severity} Severity` : 'Healthy'}
+                  <span className="bg-orange-50 text-orange-700 border border-orange-200 text-xs font-bold px-2 py-1 rounded-md">
+                    {record.severity} Severity
                   </span>
                 </div>
               </div>
@@ -349,4 +280,4 @@ const DiseaseDetection = () => {
   );
 };
 
-export default DiseaseDetection;
+export default PestDetection;

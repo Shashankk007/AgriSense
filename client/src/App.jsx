@@ -5,6 +5,8 @@ import Layout from './pages/Layout.jsx'
 import Dashboard from './pages/Dashboard.jsx'
 import CropPrediction from './pages/CropPrediction.jsx'
 import DiseaseDetection from './pages/DiseaseDetection.jsx'
+import PestDetection from './pages/PestDetection.jsx'
+import CropHealth from './pages/CropHealth.jsx'
 import Login from './pages/login.jsx' 
 import Signup from './pages/SignUp.jsx';
 import Profile from './pages/Profile.jsx';
@@ -47,6 +49,8 @@ const App = () => {
           <Route index element={<Dashboard />} />
           <Route path="crop-prediction" element={<CropPrediction />} />
           <Route path="disease-detection" element={<DiseaseDetection />} />
+          <Route path="pest-detection" element={<PestDetection />} />
+          <Route path="crop-health" element={<CropHealth />} />
           <Route path="profile" element={<Profile />} />
           <Route path="detection-history" element={<DetectionHistory />} />
         </Route>

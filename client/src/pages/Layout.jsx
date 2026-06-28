@@ -1,10 +1,11 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext'; // 👈 Naya Import
 
 const Layout = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   // Accessing user data and logout function from AuthContext
   const { user, logout } = useContext(AuthContext);
@@ -18,12 +19,22 @@ const Layout = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
+    <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row relative overflow-hidden">
+
+      {/* Toggle Button for Mobile & Desktop */}
+      <button 
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        className="absolute top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-md hover:bg-gray-100 transition-colors"
+      >
+        <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
 
       {/* Sidebar Container */}
-      <aside className="w-full md:w-72 bg-white border-r border-gray-200 flex flex-col h-screen sticky top-0 shadow-sm z-10">
+      <aside className={`fixed md:relative w-72 bg-white border-r border-gray-200 flex flex-col h-screen shadow-sm z-40 transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} ${!isSidebarOpen && 'md:hidden'}`}>
 
-        <div className="p-6 pb-4">
+        <div className="p-6 pb-4 ml-12">
           <Link to="/" className="text-2xl font-extrabold tracking-tight text-green-600 hover:opacity-80 transition-opacity flex items-center gap-2">
             🌱 Agrisense
           </Link>
@@ -59,6 +70,26 @@ const Layout = () => {
               }`}
           >
             <span className="text-xl">🔍</span> Disease Detection
+          </Link>
+
+          <Link
+            to="/workspace/pest-detection"
+            className={`flex items-center gap-3 p-3.5 rounded-xl font-semibold transition-all ${isActive('/workspace/pest-detection')
+                ? 'bg-orange-500 text-white shadow-md'
+                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+              }`}
+          >
+            <span className="text-xl">🐛</span> Pest Detection
+          </Link>
+
+          <Link
+            to="/workspace/crop-health"
+            className={`flex items-center gap-3 p-3.5 rounded-xl font-semibold transition-all ${isActive('/workspace/crop-health')
+                ? 'bg-green-600 text-white shadow-md'
+                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+              }`}
+          >
+            <span className="text-xl">🗺️</span> Crop Health Map
           </Link>
 
           <Link
@@ -125,8 +156,8 @@ const Layout = () => {
       </aside>
 
       {/* Dynamic Content Panel */}
-      <main className="grow bg-[#f4f9f6] h-screen overflow-y-auto">
-        <div className="p-6 md:p-10">
+      <main className={`grow bg-[#f4f9f6] h-screen overflow-y-auto transition-all duration-300 ${!isSidebarOpen ? 'ml-0' : 'md:ml-0 ml-72'}`}>
+        <div className="p-6 md:p-10 pt-16 md:pt-10">
           <Outlet />
         </div>
       </main>

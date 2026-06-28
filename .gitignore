@@ -1,28 +1,47 @@
 
-# Node dependencies
-backend/node_modules/
-backend/npm-debug.log*
-backend/yarn-debug.log*
-backend/yarn-error.log*
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# Backend Environment Variables 
+# Environment variables
 backend/.env
+client/.env
+ml-service/.env
 
+# Node dependencies and build output
+backend/node_modules/
+client/node_modules/
+client/dist/
+client/dist-ssr/
 
 # Python virtual environments
 ml-service/.venv/
 ml-service/env/
 ml-service/venv/
 
-# Python caching
+# Python cache
 ml-service/__pycache__/
+ml-service/**/__pycache__/
 ml-service/**/*.py[cod]
 ml-service/*$py.class
 
-# ML-Service Environment Variables & Sensitive Credentials
-ml-service/.env
+# Sensitive local files
 ml-service/private-key.json
 
-# Chatbot Documentation (Ignore from git)
+# Local docs/plans
 ml-service/chatbot_documentation.md
 ml-service/implementation_plan.md
+
+# Editor and OS files
+.vscode/
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

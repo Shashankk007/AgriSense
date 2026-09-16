@@ -81,7 +81,7 @@ export const getCurrentUserAPI = async () => {
 export const googleLoginAPI = async (credential) => {
   try {
     const response = await apiClient.post(`/auth/google-login`, { credential });
-    return response.data; //This will contain the user info and success status
+    return response.data;
   } catch (error) {
     console.error("Login failed:", error);
     throw error;
@@ -92,9 +92,46 @@ export const googleLoginAPI = async (credential) => {
 export const logoutAPI = async () => {
   try {
     const response = await apiClient.post(`/auth/logout`);
-    return response.data; //This will contain the success status
+    return response.data;
   } catch (error) {
     console.error("Logout failed:", error);
+    throw error;
+  }
+};
+
+// Update profile (username, phone, address)
+export const updateProfileAPI = async ({ username, phone, address }) => {
+  try {
+    const response = await apiClient.patch('/auth/me', { username, phone, address });
+    return response.data;
+  } catch (error) {
+    console.error('Failed to update profile:', error);
+    throw error;
+  }
+};
+
+// Change password
+export const changePasswordAPI = async ({ oldPassword, newPassword }) => {
+  try {
+    const response = await apiClient.post('/auth/change-password', { oldPassword, newPassword });
+    return response.data;
+  } catch (error) {
+    console.error('Failed to change password:', error);
+    throw error;
+  }
+};
+
+// Change profile image (multipart/form-data)
+export const changeProfileImageAPI = async (file) => {
+  try {
+    const formData = new FormData();
+    formData.append('profileImage', file);
+    const response = await apiClient.patch('/auth/profile-image', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Failed to update profile image:', error);
     throw error;
   }
 };

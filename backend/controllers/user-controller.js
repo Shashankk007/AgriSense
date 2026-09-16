@@ -240,4 +240,40 @@ const getUser = wrapAsync(async(req, res) => {
     res.status(200).json(user);
 })
 
-export { registerUser, loginUser, logoutUser , changePassword, changeProfileImage, refreshAccessToken, getUser };
+
+const updateProfile = wrapAsync(async (req, res) => {
+    const { username, phone, address } = req.body;
+
+    const user = await User.findById(req.user.id).select("-password -refreshToken");
+    if (!user) {
+        throw new apiError(404, "User not found");
+    }
+
+    // If username is being changed, ensure it's not already taken
+    if (username && username !== user.username) {
+        const existing = await User.findOne({ username });
+        if (existing) {
+            throw new apiError(409, "Username is already taken");
+        }
+        user.username = username;
+    }
+
+    if (phone !== undefined) user.phone = phone;
+    if (address !== undefined) user.address = address;
+
+    await user.save({ validateBeforeSave: false });
+
+    return res.status(200).json({
+        message: "Profile updated successfully",
+        user: {
+            id: user._id,
+            username: user.username,
+            email: user.email,
+            profileImage: user.profileImage,
+            phone: user.phone,
+            address: user.address,
+        },
+    });
+});
+
+export { registerUser, loginUser, logoutUser, changePassword, changeProfileImage, refreshAccessToken, getUser, updateProfile };

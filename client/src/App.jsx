@@ -8,6 +8,7 @@ import DiseaseDetection from './pages/DiseaseDetection.jsx'
 import Auth from './pages/Auth.jsx' 
 import Signup from './pages/SignUp.jsx';
 import Profile from './pages/Profile.jsx';
+import ChatWidget from './components/ChatWidget.jsx';
 import { AuthContext } from './context/AuthContext';
 
 // ProtectedRoute component ensures that only authenticated users can access certain routes.
@@ -46,6 +47,9 @@ const App = () => {
           <Route path="profile" element={<Profile />} />
         </Route>
       </Routes>
+
+      {/* Global floating AI chat widget — visible on all pages for logged-in users */}
+      <ChatWidget />
     </div>
   )
 }

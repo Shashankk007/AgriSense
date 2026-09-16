@@ -9,8 +9,12 @@ import {
   logoutUser,
   refreshAccessToken,
   getUser,
+  changePassword,
+  changeProfileImage,
+  updateProfile,
 } from "../controllers/user-controller.js";
 import { isLoggedIn } from "../middlewares/isLoggerIn.js";
+import { upload } from "../middlewares/multer.js";
 import wrapAsync from "../utils/wrapAsync.js";
 import apiError from "../utils/apiError.js";
 
@@ -103,5 +107,10 @@ router.post(
 router.post("/refresh-token", refreshAccessToken);
 router.post("/logout", isLoggedIn, logoutUser);
 router.get("/me", isLoggedIn, getUser);
+
+// Profile management routes
+router.patch("/me", isLoggedIn, updateProfile);
+router.post("/change-password", isLoggedIn, changePassword);
+router.patch("/profile-image", isLoggedIn, upload.single("profileImage"), changeProfileImage);
 
 export default router;

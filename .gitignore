@@ -22,3 +22,6 @@ ml-service/*$py.class
 # ML-Service Environment Variables & Sensitive Credentials
 ml-service/.env
 ml-service/private-key.json
+
+# Ignore temporary agent/session handover files
+SESSION_HANDOVER.md

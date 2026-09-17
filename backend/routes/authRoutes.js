@@ -12,6 +12,8 @@ import {
   changePassword,
   changeProfileImage,
   updateProfile,
+  forgotPassword,
+  resetPassword,
 } from "../controllers/user-controller.js";
 import { isLoggedIn } from "../middlewares/isLoggerIn.js";
 import { upload } from "../middlewares/multer.js";
@@ -99,6 +101,8 @@ router.post(
           username: user.username,
           email: user.email,
           profileImage: user.profileImage,
+          phone: user.phone || '',
+          address: user.address || '',
         },
       });
   }),
@@ -107,6 +111,10 @@ router.post(
 router.post("/refresh-token", refreshAccessToken);
 router.post("/logout", isLoggedIn, logoutUser);
 router.get("/me", isLoggedIn, getUser);
+
+// Password Reset routes
+router.post("/forgot-password", forgotPassword);
+router.post("/reset-password/:token", resetPassword);
 
 // Profile management routes
 router.patch("/me", isLoggedIn, updateProfile);

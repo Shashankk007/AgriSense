@@ -53,12 +53,35 @@ export const loginAPI = async (email, password) => {
   }
 };
 
-export const registerAPI = async ({ username, email, password }) => {
+// Password reset APIs
+export const forgotPasswordAPI = async (email) => {
+  try {
+    const response = await apiClient.post('/auth/forgot-password', { email });
+    return response.data;
+  } catch (error) {
+    console.error('Error sending reset link', error);
+    throw error;
+  }
+};
+
+export const resetPasswordAPI = async (token, password) => {
+  try {
+    const response = await apiClient.post(`/auth/reset-password/${token}`, { password });
+    return response.data;
+  } catch (error) {
+    console.error('Error resetting password', error);
+    throw error;
+  }
+};
+
+export const registerAPI = async ({ username, email, password, phone, address }) => {
   try {
     const response = await apiClient.post('/auth/register', {
       username,
       email,
       password,
+      phone,
+      address,
     });
     return response.data;
   } catch (error) {
@@ -81,7 +104,7 @@ export const getCurrentUserAPI = async () => {
 export const googleLoginAPI = async (credential) => {
   try {
     const response = await apiClient.post(`/auth/google-login`, { credential });
-    return response.data;
+    return response.data; //This will contain the user info and success status
   } catch (error) {
     console.error("Login failed:", error);
     throw error;
@@ -92,7 +115,7 @@ export const googleLoginAPI = async (credential) => {
 export const logoutAPI = async () => {
   try {
     const response = await apiClient.post(`/auth/logout`);
-    return response.data;
+    return response.data; //This will contain the success status
   } catch (error) {
     console.error("Logout failed:", error);
     throw error;

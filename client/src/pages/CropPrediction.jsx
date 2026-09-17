@@ -158,11 +158,10 @@ const CropPrediction = () => {
                 {farms.map((farm) => (
                   <div
                     key={farm._id}
-                    className={`flex items-center justify-between px-3 py-2.5 rounded-xl border cursor-pointer transition-all ${
-                      selectedFarmId === farm._id
+                    className={`flex items-center justify-between px-3 py-2.5 rounded-xl border cursor-pointer transition-all ${selectedFarmId === farm._id
                         ? 'bg-green-50 border-green-300 shadow-sm'
                         : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                    }`}
+                      }`}
                     onClick={() => setSelectedFarmId(farm._id)}
                   >
                     <div className="flex items-center gap-2 min-w-0">

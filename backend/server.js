@@ -6,7 +6,11 @@ import helmet from "helmet";
 
 import farmRoutes from "./routes/farmRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
-import {connectDb} from "./utils/db.js";
+import detectionRoutes from "./routes/detectionRoutes.js";
+import cropRoutes from "./routes/cropRoutes.js";
+import inventoryRoutes from "./routes/inventoryRoutes.js";
+import analyticsRoutes from "./routes/analyticsRoutes.js";
+import { connectDb } from "./utils/db.js";
 import apiError from "./utils/apiError.js";
 dotenv.config();
 
@@ -30,6 +34,10 @@ app.use(cookieParser());
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/farms", farmRoutes);
+app.use("/api/detection", detectionRoutes);
+app.use("/api/crops", cropRoutes);
+app.use("/api/inventory", inventoryRoutes);
+app.use("/api/analytics", analyticsRoutes);
 
 // Handle unknown routes (use middleware to avoid path token parsing issues)
 app.use((req, res, next) => {
@@ -40,6 +48,8 @@ app.use((req, res, next) => {
 app.use((err, req, res, next) => {
 	const statusCode = err.statusCode || 500;
 	const status = err.status || "error";
+	
+	console.error("🔥 Global Error Handler Caught:", err);
 
 	res.status(statusCode).json({
 		status,

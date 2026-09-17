@@ -29,7 +29,9 @@ Interactions:
 """
 
 import uuid
+import asyncio
 
+from chatbot.agents.memory_extractor import extract_memory_from_message
 from chatbot.chains.chat_chain import run_chat_chain
 from chatbot.memory.conversation import ConversationMemory
 from chatbot.memory.long_term import LongTermMemory
@@ -138,6 +140,9 @@ class ChatService:
         except Exception as e:
             logger.warning("Failed to persist conversation (non-fatal): %s", str(e))
 
+         # Step 6.5: Run memory extraction in the background
+        asyncio.create_task(self._background_memory_extraction(request.user_id, request.message))
+
         # Step 7: Build source citations
         sources = [
             SourceDocument(
@@ -155,3 +160,16 @@ class ChatService:
             conversation_id=conversation_id,
             sources=sources,
         )
+
+    async def _background_memory_extraction(self, user_id: str, message: str):
+        """
+        Runs the memory extractor in the background. If a fact is found,
+        it stores it directly to the user's long-term memory.
+        """
+        try:
+            fact = await extract_memory_from_message(message)
+            if fact:
+                await self._long_term_memory.store_memory(user_id, fact)
+        except Exception as e:
+            logger.error("Background memory extraction error: %s", str(e), exc_info=True)
+

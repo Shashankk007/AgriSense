@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { uploadDiseaseImageAPI, getUserDiseaseImagesAPI, deleteDiseaseImageAPI } from '../api/detectionApi';
+import { uploadPestImageAPI, getUserPestImagesAPI, deletePestImageAPI } from '../api/detectionApi';
 
-const DiseaseDetection = () => {
+const PestDetection = () => {
   const { user } = useContext(AuthContext);
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
@@ -13,7 +13,7 @@ const DiseaseDetection = () => {
   const fetchHistory = async () => {
     if (!user) return;
     try {
-      const res = await getUserDiseaseImagesAPI(user.id || user._id);
+      const res = await getUserPestImagesAPI(user.id || user._id);
       setHistory(res.detections || []);
     } catch (error) {
       console.error("Failed to load history", error);
@@ -38,7 +38,7 @@ const DiseaseDetection = () => {
     if (!file) return;
     setUploading(true);
     try {
-      await uploadDiseaseImageAPI(file);
+      await uploadPestImageAPI(file);
       setFile(null);
       setPreview(null);
       fetchHistory(); // refresh history
@@ -50,11 +50,11 @@ const DiseaseDetection = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Delete this scan?")) return;
     try {
-      await deleteDiseaseImageAPI(id);
-      setHistory(history.filter(h => h._id !== id));
+      await deletePestImageAPI(id);
+      setHistory((prev) => prev.filter(h => h._id !== id));
     } catch (error) {
+      console.error("Delete failed", error);
       alert("Delete failed");
     }
   };
@@ -62,8 +62,8 @@ const DiseaseDetection = () => {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">🔬 Disease Detection</h1>
-        <p className="text-gray-600 mt-2">Upload a clear image of a plant leaf to save it for disease analysis.</p>
+        <h1 className="text-3xl font-bold text-gray-800">🐛 Pest Detection</h1>
+        <p className="text-gray-600 mt-2">Upload a clear image of a pest to save it for analysis.</p>
       </div>
 
       <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 mb-8">
@@ -81,7 +81,7 @@ const DiseaseDetection = () => {
                 </button>
                 <button 
                   onClick={handleUpload}
-                  className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
                   disabled={uploading}
                 >
                   {uploading ? 'Uploading...' : 'Upload & Analyze'}
@@ -104,7 +104,7 @@ const DiseaseDetection = () => {
         {loadingHistory ? (
           <p className="text-gray-500">Loading history...</p>
         ) : history.length === 0 ? (
-          <p className="text-gray-500 italic">No disease scans yet.</p>
+          <p className="text-gray-500 italic">No pest scans yet.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {history.map((scan) => (
@@ -114,7 +114,7 @@ const DiseaseDetection = () => {
                   <div>
                     <h4 className="font-semibold text-gray-800">Scan Recorded</h4>
                     <p className="text-xs text-gray-500">{new Date(scan.createdAt).toLocaleString()}</p>
-                    <p className="text-xs text-amber-600 mt-2 font-medium">Pending ML Diagnosis...</p>
+                    <p className="text-xs text-blue-600 mt-2 font-medium">Pending ML Diagnosis...</p>
                   </div>
                   <button 
                     onClick={() => handleDelete(scan._id)} 
@@ -132,4 +132,4 @@ const DiseaseDetection = () => {
   );
 };
 
-export default DiseaseDetection;
+export default PestDetection;

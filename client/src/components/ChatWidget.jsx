@@ -20,9 +20,6 @@ const ChatWidget = () => {
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
-  // Only render for authenticated users
-  if (!user) return null;
-
   // Auto-scroll inside chat panel
   useEffect(() => {
     if (isOpen) {
@@ -37,6 +34,9 @@ const ChatWidget = () => {
       setTimeout(() => inputRef.current?.focus(), 100);
     }
   }, [isOpen]);
+
+  // Only render for authenticated users
+  if (!user) return null;
 
   const sendMessage = async (e) => {
     e?.preventDefault();
@@ -84,11 +84,11 @@ const ChatWidget = () => {
   ];
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
+    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3 pointer-events-none">
 
       {/* ── Chat Panel ── */}
       <div
-        className={`transition-all duration-300 ease-in-out origin-bottom-right ${
+        className={`transition-all duration-300 ease-in-out origin-bottom-right pointer-events-auto ${
           isOpen
             ? 'opacity-100 scale-100 translate-y-0'
             : 'opacity-0 scale-95 translate-y-4 pointer-events-none'
@@ -238,7 +238,7 @@ const ChatWidget = () => {
       {/* ── Floating Round Button ── */}
       <button
         onClick={handleToggle}
-        className={`w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 ${
+        className={`pointer-events-auto w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 ${
           isOpen
             ? 'bg-gray-700 hover:bg-gray-800'
             : 'bg-green-600 hover:bg-green-700'

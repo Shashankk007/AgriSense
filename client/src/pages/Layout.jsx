@@ -63,6 +63,28 @@ const Layout = () => {
           >
             <span className="text-xl">🔍</span> Disease Detection
           </Link>
+          
+          <Link 
+            to="/workspace/pest-detection" 
+            className={`flex items-center gap-3 p-3.5 rounded-xl font-semibold transition-all ${
+              isActive('/workspace/pest-detection') 
+                ? 'bg-green-600 text-white shadow-md' 
+                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+            }`}
+          >
+            <span className="text-xl">🐛</span> Pest Detection
+          </Link>
+
+          <Link 
+            to="/workspace/inventory" 
+            className={`flex items-center gap-3 p-3.5 rounded-xl font-semibold transition-all ${
+              isActive('/workspace/inventory') 
+                ? 'bg-green-600 text-white shadow-md' 
+                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+            }`}
+          >
+            <span className="text-xl">📦</span> Inventory
+          </Link>
         </nav>
 
         {/* Bottom Section: User Profile */}

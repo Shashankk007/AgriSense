@@ -18,6 +18,7 @@ Interactions:
 """
 
 from functools import lru_cache
+from typing import Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -25,6 +26,8 @@ class Settings(BaseSettings):
     """
     All configuration is loaded from environment variables (or .env file).
     Pydantic validates types and raises clear errors on missing values.
+    Every field from the .env file is explicitly declared here so that
+    Pydantic validation remains strict — no unknown variables are silently ignored.
     """
 
     # ---- Google Gemini ----
@@ -38,6 +41,7 @@ class Settings(BaseSettings):
     KNOWLEDGE_COLLECTION: str = "knowledge_base"
     MEMORY_COLLECTION: str = "user_memories"
     CONVERSATION_COLLECTION: str = "conversations"
+    MONGO_FARM_COLLECTION: str = "farms"
 
     # ---- Vector Search Index Names ----
     KNOWLEDGE_INDEX_NAME: str = "knowledge_vector_index"
@@ -50,6 +54,16 @@ class Settings(BaseSettings):
 
     # ---- Server ----
     ML_SERVICE_PORT: int = 8000
+    CORS_ORIGIN: str = "http://localhost:5176"
+    ML_DEVICE: str = "cpu"
+
+    # ---- Google Earth Engine (optional — only needed for NDVI features) ----
+    GEE_INIT_MODE: Optional[str] = None
+    GEE_SERVICE_ACCOUNT: Optional[str] = None
+    GEE_PRIVATE_KEY_FILE: Optional[str] = None
+
+    # ---- Groq (optional — only needed if Groq LLM is enabled) ----
+    GROQ_API_KEY: Optional[str] = None
 
     model_config = SettingsConfigDict(
         env_file=".env",

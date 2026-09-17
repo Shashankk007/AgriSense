@@ -21,6 +21,8 @@ export const AuthProvider = ({ children }) => {
             email: data.email,
             picture: data.profileImage,
             profileImage: data.profileImage,
+            phone: data.phone || '',
+            address: data.address || '',
           });
         }
       } catch (error) {

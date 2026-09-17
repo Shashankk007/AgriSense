@@ -23,6 +23,8 @@ const Auth = () => {
           email: data.user.email,
           picture: data.user.profileImage,
           profileImage: data.user.profileImage,
+          phone: data.user.phone || '',
+          address: data.user.address || '',
         }); 
         navigate('/workspace'); 
       }
@@ -46,6 +48,8 @@ const Auth = () => {
         email: user.email,
         picture: user.profileImage,
         profileImage: user.profileImage,
+        phone: user.phone || '',
+        address: user.address || '',
       });
       navigate('/workspace');
     } catch (error) {
@@ -99,7 +103,7 @@ const Auth = () => {
           </div>
 
           <div className="flex justify-end">
-            <a href="#" className="text-sm font-medium text-green-600 hover:underline">Forgot password?</a>
+            <Link to="/forgot-password" className="text-sm font-medium text-green-600 hover:underline">Forgot password?</Link>
           </div>
 
           <button 

@@ -2,6 +2,48 @@ import React, { useState, useEffect, useContext, useRef } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { updateProfileAPI, changePasswordAPI, changeProfileImageAPI } from '../api/farmApi';
 
+// ── Country codes list ──
+const COUNTRY_CODES = [
+  { code: '+91',  flag: '🇮🇳', name: 'India' },
+  { code: '+1',   flag: '🇺🇸', name: 'USA / Canada' },
+  { code: '+44',  flag: '🇬🇧', name: 'UK' },
+  { code: '+61',  flag: '🇦🇺', name: 'Australia' },
+  { code: '+49',  flag: '🇩🇪', name: 'Germany' },
+  { code: '+33',  flag: '🇫🇷', name: 'France' },
+  { code: '+86',  flag: '🇨🇳', name: 'China' },
+  { code: '+81',  flag: '🇯🇵', name: 'Japan' },
+  { code: '+82',  flag: '🇰🇷', name: 'South Korea' },
+  { code: '+7',   flag: '🇷🇺', name: 'Russia' },
+  { code: '+55',  flag: '🇧🇷', name: 'Brazil' },
+  { code: '+52',  flag: '🇲🇽', name: 'Mexico' },
+  { code: '+27',  flag: '🇿🇦', name: 'South Africa' },
+  { code: '+20',  flag: '🇪🇬', name: 'Egypt' },
+  { code: '+234', flag: '🇳🇬', name: 'Nigeria' },
+  { code: '+254', flag: '🇰🇪', name: 'Kenya' },
+  { code: '+92',  flag: '🇵🇰', name: 'Pakistan' },
+  { code: '+880', flag: '🇧🇩', name: 'Bangladesh' },
+  { code: '+94',  flag: '🇱🇰', name: 'Sri Lanka' },
+  { code: '+977', flag: '🇳🇵', name: 'Nepal' },
+  { code: '+971', flag: '🇦🇪', name: 'UAE' },
+  { code: '+966', flag: '🇸🇦', name: 'Saudi Arabia' },
+  { code: '+62',  flag: '🇮🇩', name: 'Indonesia' },
+  { code: '+63',  flag: '🇵🇭', name: 'Philippines' },
+  { code: '+60',  flag: '🇲🇾', name: 'Malaysia' },
+  { code: '+66',  flag: '🇹🇭', name: 'Thailand' },
+];
+
+// Helper — split stored phone string (e.g. "+91 9876543210") into {code, number}
+function parsePhone(stored) {
+  if (!stored) return { code: '+91', number: '' };
+  for (const c of COUNTRY_CODES) {
+    if (stored.startsWith(c.code + ' ')) {
+      return { code: c.code, number: stored.slice(c.code.length + 1) };
+    }
+  }
+  // No known prefix — treat entire string as number
+  return { code: '+91', number: stored };
+}
+
 const Profile = () => {
   const { user, setUser } = useContext(AuthContext);
 
@@ -9,11 +51,14 @@ const Profile = () => {
   const [formData, setFormData] = useState({
     username: '',
     email: '',
-    phone: '',
     address: '',
   });
+  const [countryCode, setCountryCode] = useState('+91');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [phoneError, setPhoneError] = useState('');
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileMsg, setProfileMsg] = useState(null); // { type: 'success'|'error', text: '' }
+  const [isEditing, setIsEditing] = useState(false);
 
   // --- Password form state ---
   const [pwForm, setPwForm] = useState({ oldPassword: '', newPassword: '', confirmPassword: '' });
@@ -26,13 +71,17 @@ const Profile = () => {
   const [previewUrl, setPreviewUrl] = useState('');
   const fileInputRef = useRef(null);
 
-  // Bootstrap form from context user
+  // Bootstrap form from context user — only on initial mount, not on every user update
+  const bootstrapped = useRef(false);
   useEffect(() => {
-    if (user) {
+    if (user && !bootstrapped.current) {
+      bootstrapped.current = true;
+      const parsed = parsePhone(user.phone || '');
+      setCountryCode(parsed.code);
+      setPhoneNumber(parsed.number);
       setFormData({
         username: user.name || '',
         email: user.email || '',
-        phone: user.phone || '',
         address: user.address || '',
       });
       setPreviewUrl(user.picture || user.profileImage || '');
@@ -49,25 +98,68 @@ const Profile = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleCancelEdit = () => {
+    // Revert form data to the stored user context values
+    const parsed = parsePhone(user.phone || '');
+    setCountryCode(parsed.code);
+    setPhoneNumber(parsed.number);
+    setPhoneError('');
+    setFormData({
+      username: user.name || '',
+      email: user.email || '',
+      address: user.address || '',
+    });
+    setProfileMsg(null);
+    setIsEditing(false);
+  };
+
+  // ── Phone validation ──
+  const validatePhone = (num) => {
+    if (!num) return ''; // optional field
+    // Just ensure it only contains digits, though the input handler already strips non-digits.
+    return '';
+  };
+
+  const handlePhoneChange = (e) => {
+    const val = e.target.value.replace(/\D/g, ''); // strip non-digits, no length limit
+    setPhoneNumber(val);
+    setPhoneError(validatePhone(val));
+  };
+
   const handleProfileSave = async (e) => {
     e.preventDefault();
+    // Validate phone before submitting
+    const pErr = validatePhone(phoneNumber);
+    if (pErr) { setPhoneError(pErr); return; }
+
     setProfileSaving(true);
     setProfileMsg(null);
+    const combinedPhone = phoneNumber ? `${countryCode} ${phoneNumber}` : '';
     try {
       const result = await updateProfileAPI({
         username: formData.username.trim(),
-        phone: formData.phone.trim(),
+        phone: combinedPhone,
         address: formData.address.trim(),
       });
-      // Update AuthContext so sidebar and other parts refresh
+      console.log('✅ Profile save result:', result);
       setUser((prev) => ({
         ...prev,
         name: result.user.username,
         phone: result.user.phone,
         address: result.user.address,
       }));
+      const parsed = parsePhone(result.user.phone || '');
+      setCountryCode(parsed.code);
+      setPhoneNumber(parsed.number);
+      setFormData((prev) => ({
+        ...prev,
+        username: result.user.username,
+        address: result.user.address || '',
+      }));
       setProfileMsg({ type: 'success', text: '✅ Profile updated successfully!' });
+      setIsEditing(false); // <--- Exit edit mode on success
     } catch (err) {
+      console.error('❌ Profile save error:', err?.response?.data || err.message);
       const msg = err?.response?.data?.message || 'Failed to update profile.';
       setProfileMsg({ type: 'error', text: msg });
     } finally {
@@ -201,7 +293,21 @@ const Profile = () => {
 
           {/* Profile Edit Form */}
           <form onSubmit={handleProfileSave} className="space-y-5">
-            <h3 className="text-base font-bold text-gray-700 border-b border-gray-100 pb-2">Personal Information</h3>
+            <div className="flex items-center justify-between border-b border-gray-100 pb-2">
+              <h3 className="text-base font-bold text-gray-700">Personal Information</h3>
+              {!isEditing && (
+                <button
+                  type="button"
+                  onClick={(e) => { e.preventDefault(); setIsEditing(true); }}
+                  className="text-sm font-bold text-green-600 hover:text-green-700 hover:bg-green-50 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                  </svg>
+                  Edit
+                </button>
+              )}
+            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               {/* Username */}
@@ -212,7 +318,12 @@ const Profile = () => {
                   name="username"
                   value={formData.username}
                   onChange={handleProfileChange}
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all text-sm"
+                  disabled={!isEditing}
+                  className={`w-full px-4 py-2.5 rounded-xl outline-none transition-all text-sm ${
+                    isEditing 
+                      ? 'bg-gray-50 border border-gray-200 focus:bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500' 
+                      : 'bg-transparent border-b border-gray-200 text-gray-700 font-medium'
+                  }`}
                   required
                 />
               </div>
@@ -224,22 +335,62 @@ const Profile = () => {
                   type="email"
                   value={formData.email}
                   disabled
-                  className="w-full px-4 py-2.5 bg-gray-100 border border-gray-200 rounded-xl text-gray-400 cursor-not-allowed text-sm"
+                  className={`w-full px-4 py-2.5 rounded-xl text-sm ${
+                    isEditing 
+                      ? 'bg-gray-100 border border-gray-200 text-gray-400 cursor-not-allowed'
+                      : 'bg-transparent border-b border-gray-200 text-gray-700 font-medium cursor-not-allowed'
+                  }`}
                 />
                 <p className="text-xs text-gray-400 mt-1">Email cannot be changed.</p>
               </div>
 
-              {/* Phone */}
-              <div>
+              {/* Phone — country code + number */}
+              <div className="sm:col-span-2">
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">Mobile Number</label>
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleProfileChange}
-                  placeholder="+91 9876543210"
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all text-sm"
-                />
+                <div className="flex gap-2">
+                  {/* Country code dropdown */}
+                  <select
+                    value={countryCode}
+                    onChange={(e) => setCountryCode(e.target.value)}
+                    disabled={!isEditing}
+                    className={`px-3 py-2.5 rounded-xl outline-none transition-all text-sm shrink-0 ${
+                      isEditing 
+                        ? 'bg-gray-50 border border-gray-200 focus:bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500 cursor-pointer'
+                        : 'bg-transparent border-b border-gray-200 text-gray-700 font-medium appearance-none cursor-not-allowed'
+                    }`}
+                  >
+                    {COUNTRY_CODES.map((c) => (
+                      <option key={c.code} value={c.code}>
+                        {c.flag} {c.code} {c.name}
+                      </option>
+                    ))}
+                  </select>
+                  {/* Phone number */}
+                  <div className="flex-1">
+                    <input
+                      type="tel"
+                      inputMode="numeric"
+                      value={phoneNumber}
+                      onChange={handlePhoneChange}
+                      placeholder={isEditing ? "9876543210" : "No phone number added"}
+                      disabled={!isEditing}
+                      className={`w-full px-4 py-2.5 rounded-xl outline-none transition-all text-sm ${
+                        !isEditing 
+                          ? 'bg-transparent border-b border-gray-200 text-gray-700 font-medium'
+                          : phoneError
+                            ? 'bg-gray-50 border border-red-400 focus:ring-red-400 focus:border-red-400'
+                            : 'bg-gray-50 border border-gray-200 focus:bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500'
+                      }`}
+                    />
+                    {isEditing && phoneError ? (
+                      <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                        <span>⚠️</span> {phoneError}
+                      </p>
+                    ) : isEditing && phoneNumber.length > 0 ? (
+                      <p className="text-xs text-green-600 mt-1">✓ Valid number format</p>
+                    ) : null}
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -250,29 +401,44 @@ const Profile = () => {
                 name="address"
                 value={formData.address}
                 onChange={handleProfileChange}
-                rows="3"
-                placeholder="Enter your complete address..."
-                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all text-sm resize-none"
+                disabled={!isEditing}
+                rows={isEditing ? "3" : "1"}
+                placeholder={isEditing ? "Enter your complete address..." : "No address added"}
+                className={`w-full px-4 py-2.5 rounded-xl outline-none transition-all text-sm resize-none ${
+                  isEditing 
+                    ? 'bg-gray-50 border border-gray-200 focus:bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500'
+                    : 'bg-transparent border-b border-gray-200 text-gray-700 font-medium'
+                }`}
               />
             </div>
 
             <MsgBanner msg={profileMsg} />
 
-            <div className="flex justify-end">
-              <button
-                type="submit"
-                disabled={profileSaving}
-                className="bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white font-bold py-2.5 px-8 rounded-xl transition-all hover:-translate-y-0.5 shadow-sm flex items-center gap-2"
-              >
-                {profileSaving && (
-                  <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-                  </svg>
-                )}
-                {profileSaving ? 'Saving...' : 'Save Changes'}
-              </button>
-            </div>
+            {isEditing && (
+              <div className="flex justify-end gap-3 mt-2">
+                <button
+                  type="button"
+                  onClick={handleCancelEdit}
+                  disabled={profileSaving}
+                  className="px-6 py-2.5 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-100 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={profileSaving}
+                  className="bg-green-600 hover:bg-green-700 active:scale-95 disabled:bg-green-400 disabled:active:scale-100 text-white font-bold py-2.5 px-8 rounded-xl transition-all hover:-translate-y-0.5 shadow-sm flex items-center gap-2"
+                >
+                  {profileSaving && (
+                    <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                    </svg>
+                  )}
+                  {profileSaving ? 'Saving...' : 'Save Changes'}
+                </button>
+              </div>
+            )}
           </form>
         </div>
       </div>
@@ -331,7 +497,7 @@ const Profile = () => {
             <button
               type="submit"
               disabled={pwSaving}
-              className="bg-gray-800 hover:bg-gray-900 disabled:bg-gray-400 text-white font-bold py-2.5 px-8 rounded-xl transition-all hover:-translate-y-0.5 shadow-sm flex items-center gap-2"
+              className="bg-gray-800 hover:bg-gray-900 active:scale-95 disabled:bg-gray-400 disabled:active:scale-100 text-white font-bold py-2.5 px-8 rounded-xl transition-all hover:-translate-y-0.5 shadow-sm flex items-center gap-2"
             >
               {pwSaving && (
                 <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">

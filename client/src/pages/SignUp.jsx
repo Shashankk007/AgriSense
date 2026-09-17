@@ -4,6 +4,36 @@ import { GoogleLogin } from '@react-oauth/google';
 import { AuthContext } from '../context/AuthContext'; 
 import { googleLoginAPI, registerAPI } from '../api/farmApi'; 
 
+// ── Country codes list ──
+const COUNTRY_CODES = [
+  { code: '+91',  flag: '🇮🇳', name: 'India' },
+  { code: '+1',   flag: '🇺🇸', name: 'USA / Canada' },
+  { code: '+44',  flag: '🇬🇧', name: 'UK' },
+  { code: '+61',  flag: '🇦🇺', name: 'Australia' },
+  { code: '+49',  flag: '🇩🇪', name: 'Germany' },
+  { code: '+33',  flag: '🇫🇷', name: 'France' },
+  { code: '+86',  flag: '🇨🇳', name: 'China' },
+  { code: '+81',  flag: '🇯🇵', name: 'Japan' },
+  { code: '+82',  flag: '🇰🇷', name: 'South Korea' },
+  { code: '+7',   flag: '🇷🇺', name: 'Russia' },
+  { code: '+55',  flag: '🇧🇷', name: 'Brazil' },
+  { code: '+52',  flag: '🇲🇽', name: 'Mexico' },
+  { code: '+27',  flag: '🇿🇦', name: 'South Africa' },
+  { code: '+20',  flag: '🇪🇬', name: 'Egypt' },
+  { code: '+234', flag: '🇳🇬', name: 'Nigeria' },
+  { code: '+254', flag: '🇰🇪', name: 'Kenya' },
+  { code: '+92',  flag: '🇵🇰', name: 'Pakistan' },
+  { code: '+880', flag: '🇧🇩', name: 'Bangladesh' },
+  { code: '+94',  flag: '🇱🇰', name: 'Sri Lanka' },
+  { code: '+977', flag: '🇳🇵', name: 'Nepal' },
+  { code: '+971', flag: '🇦🇪', name: 'UAE' },
+  { code: '+966', flag: '🇸🇦', name: 'Saudi Arabia' },
+  { code: '+62',  flag: '🇮🇩', name: 'Indonesia' },
+  { code: '+63',  flag: '🇵🇭', name: 'Philippines' },
+  { code: '+60',  flag: '🇲🇾', name: 'Malaysia' },
+  { code: '+66',  flag: '🇹🇭', name: 'Thailand' },
+];
+
 const Signup = () => {
   const navigate = useNavigate();
   const { setUser } = useContext(AuthContext); // Get setUser from memory
@@ -12,6 +42,10 @@ const Signup = () => {
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [address, setAddress] = useState('');
+  const [countryCode, setCountryCode] = useState('+91');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [phoneError, setPhoneError] = useState('');
 
   const buildUsername = () => {
     const firstPart = `${firstName}${lastName}`
@@ -38,6 +72,8 @@ const Signup = () => {
           email: data.user.email,
           picture: data.user.profileImage,
           profileImage: data.user.profileImage,
+          phone: data.user.phone || '',
+          address: data.user.address || '',
         }); // Store in React state
         navigate('/workspace'); // Redirect to dashboard
       }
@@ -49,21 +85,48 @@ const Signup = () => {
     }
   };
 
+  // ── Phone validation ──
+  const validatePhone = (num) => {
+    if (!num) return 'Mobile number is required.';
+    return '';
+  };
+
+  const handlePhoneChange = (e) => {
+    const val = e.target.value.replace(/\D/g, ''); // strip non-digits, no length limit
+    setPhoneNumber(val);
+    setPhoneError(validatePhone(val));
+  };
+
   // Manual form handler
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const pErr = validatePhone(phoneNumber);
+    if (pErr) {
+      setPhoneError(pErr);
+      return;
+    }
+
     setIsLoading(true);
     try {
       const normalizedEmail = email.trim().toLowerCase();
       const username = buildUsername();
+      const combinedPhone = `${countryCode} ${phoneNumber}`;
 
-      const data = await registerAPI({ username, email: normalizedEmail, password });
+      const data = await registerAPI({ 
+        username, 
+        email: normalizedEmail, 
+        password, 
+        phone: combinedPhone,
+        address: address.trim() 
+      });
       setUser({
         id: data.id,
         name: data.username,
         email: data.email,
         picture: data.profileImage,
         profileImage: data.profileImage,
+        phone: data.phone || '',
+        address: data.address || '',
       });
       navigate('/workspace');
     } catch (error) {
@@ -101,9 +164,46 @@ const Signup = () => {
             </div>
           </div>
 
+          {/* Phone — country code + number */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1.5">Mobile Number</label>
-            <input type="tel" className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all text-sm" placeholder="+91 9876543210" pattern="[0-9+\s-]+" required />
+            <div className="flex gap-2">
+              {/* Country code dropdown */}
+              <select
+                value={countryCode}
+                onChange={(e) => setCountryCode(e.target.value)}
+                className="px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all text-sm shrink-0 cursor-pointer"
+              >
+                {COUNTRY_CODES.map((c) => (
+                  <option key={c.code} value={c.code}>
+                    {c.flag} {c.code}
+                  </option>
+                ))}
+              </select>
+              {/* 10-digit number */}
+              <div className="flex-1">
+                <input
+                  type="tel"
+                  inputMode="numeric"
+                  value={phoneNumber}
+                  onChange={handlePhoneChange}
+                  placeholder="9876543210"
+                  className={`w-full px-4 py-2.5 bg-gray-50 border rounded-xl focus:bg-white focus:ring-2 outline-none transition-all text-sm ${
+                    phoneError
+                      ? 'border-red-400 focus:ring-red-400 focus:border-red-400'
+                      : 'border-gray-200 focus:ring-green-500 focus:border-green-500'
+                  }`}
+                  required
+                />
+                {phoneError ? (
+                  <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                    <span>⚠️</span> {phoneError}
+                  </p>
+                ) : phoneNumber.length > 0 ? (
+                  <p className="text-xs text-green-600 mt-1">✓ Valid number format</p>
+                ) : null}
+              </div>
+            </div>
           </div>
 
           <div>
@@ -113,7 +213,7 @@ const Signup = () => {
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1.5">Full Address</label>
-            <textarea rows="3" className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all text-sm resize-none" placeholder="Enter your farm or home address..." required ></textarea>
+            <textarea value={address} onChange={(e) => setAddress(e.target.value)} rows="3" className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all text-sm resize-none" placeholder="Enter your farm or home address..." required ></textarea>
           </div>
 
           <div>

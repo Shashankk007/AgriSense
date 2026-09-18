@@ -1,7 +1,11 @@
-import requests
 import json
+import os
+
+import requests
 
 base_url = "http://localhost:8000"
+# Admin endpoints (/memory/*, /knowledge/upload) need ML_ADMIN_KEY from ml-service/.env
+admin = {"X-Admin-Key": os.environ.get("ML_ADMIN_KEY", "")}
 
 print("--- Testing Health Check ---")
 res = requests.get(f"{base_url}/")
@@ -12,7 +16,7 @@ payload = {
     "user_id": "test_user_123",
     "fact": "I am a farmer from Punjab and I grow wheat on 10 acres of land."
 }
-res = requests.post(f"{base_url}/memory/store", json=payload)
+res = requests.post(f"{base_url}/memory/store", json=payload, headers=admin)
 print(res.status_code, res.json())
 
 print("\n--- Testing Knowledge Upload ---")
@@ -21,7 +25,7 @@ payload = {
     "source": "AgriSense Wheat Guide",
     "category": "crop"
 }
-res = requests.post(f"{base_url}/knowledge/upload", json=payload)
+res = requests.post(f"{base_url}/knowledge/upload", json=payload, headers=admin)
 print(res.status_code, res.json())
 
 print("\n--- Testing Chat (RAG) ---")

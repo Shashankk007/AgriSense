@@ -7,7 +7,7 @@ class apiError extends Error{
     ){
         super(message);
         this.statusCode = status;
-        this.status = status;
+        this.status = status >= 500 ? "error" : "fail";
         this.message = message;
         this.data = null;
         this.success = false;

@@ -11,7 +11,7 @@ import sendEmail from "../utils/sendEmail.js";
 const authCookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
 };
 
 
@@ -26,6 +26,10 @@ const registerUser = wrapAsync(async (req, res) => {
     }
 
 
+    if (password.length < 6) {
+        throw new apiError(400, "Password must be at least 6 characters long")
+    }
+
     // Check if user already exists
     const existingUser = await User.findOne({ $or: [{ username }, { email }] });
     if (existingUser) {
@@ -36,12 +40,13 @@ const registerUser = wrapAsync(async (req, res) => {
     // Upload profileImage if provided
     const profileImageLocalPath = req.file?.path;
 
-    let profileImageUrl = "";
+    let profileImageUrl;
     if (profileImageLocalPath) {
         try {
-            profileImageUrl = await uploadProfileImage(profileImageLocalPath);
+            const uploaded = await uploadProfileImage(profileImageLocalPath);
+            profileImageUrl = uploaded.url;
         } catch (error) {
-            throw new apiError(500, "profileImage upload failed", error);
+            throw new apiError(500, "profileImage upload failed");
         }
     }
 
@@ -50,7 +55,7 @@ const registerUser = wrapAsync(async (req, res) => {
         username,
         password,
         email,
-        profileImage: profileImageUrl,
+        ...(profileImageUrl && { profileImage: profileImageUrl }),
         phone: phone || "",
         address: address || ""
     });
@@ -142,7 +147,7 @@ const logoutUser = wrapAsync(async (req, res) => {
 
 
 const refreshAccessToken = wrapAsync(async (req, res) => {
-    const incomingRefreshToken = req.cookies.refreshtoken || req.body.refreshtoken
+    const incomingRefreshToken = req.cookies?.refreshtoken || req.body?.refreshtoken
 
     if (!incomingRefreshToken) {
         throw new apiError(401, "unauthorized request")
@@ -190,6 +195,10 @@ const changePassword = wrapAsync(async (req, res) => {
         throw new apiError(400, "All fields are required")
     }
 
+    if (newPassword.length < 6) {
+        throw new apiError(400, "New password must be at least 6 characters long")
+    }
+
     // Check if the old password is correct
     const user = await User.findById(req.user.id);
     if (!user) {
@@ -229,13 +238,13 @@ const changeProfileImage = wrapAsync(async (req, res) => {
     }
 
     // Upload new avatar to Cloudinary
-    const newUrl = await uploadProfileImage(profileImageLocalPath);
-    if (!newUrl) {
+    const uploaded = await uploadProfileImage(profileImageLocalPath);
+    if (!uploaded?.url) {
         throw new apiError(500, "Profile image upload failed")
     }
 
     // Update user's avatar URL in the database
-    user.profileImage = newUrl;
+    user.profileImage = uploaded.url;
     await user.save({ validateBeforeSave: false });
 
     return res
@@ -303,10 +312,10 @@ const forgotPassword = wrapAsync(async (req, res) => {
     await user.save({ validateBeforeSave: false });
 
     // Create reset URL
-    const clientUrl = process.env.CLIENT_URL || "http://localhost:5177";
+    const clientUrl = process.env.CLIENT_URL || "http://localhost:5176";
     const resetURL = `${clientUrl}/reset-password/${resetToken}`;
 
-    const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: \n${resetURL}\nIf you didn't forget your password, please ignore this email!`;
+    const message = `Forgot your password? Use the link below to set a new password (valid for 10 minutes): \n${resetURL}\nIf you didn't forget your password, please ignore this email!`;
     const htmlMessage = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <h2 style="color: #2e7d32;">Password Reset Request</h2>
@@ -331,6 +340,7 @@ const forgotPassword = wrapAsync(async (req, res) => {
             message: "Token sent to email!",
         });
     } catch (err) {
+        console.error("Password reset email failed:", err);
         user.resetPasswordToken = undefined;
         user.resetPasswordExpire = undefined;
         await user.save({ validateBeforeSave: false });
@@ -354,6 +364,10 @@ const resetPassword = wrapAsync(async (req, res) => {
     // 2) If token has not expired, and there is user, set the new password
     if (!user) {
         throw new apiError(400, "Token is invalid or has expired");
+    }
+
+    if (!req.body.password || req.body.password.length < 6) {
+        throw new apiError(400, "Password must be at least 6 characters long")
     }
 
     user.password = req.body.password;

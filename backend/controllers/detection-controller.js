@@ -78,6 +78,9 @@ export const uploadPestImage = async (req, res) => {
 export const getUserDiseaseImages = async (req, res) => {
     try {
         const { userId } = req.params;
+        if (String(userId) !== String(req.user._id)) {
+            throw new apiError(403, "You can only view your own scans");
+        }
 
         const detections = await DiseaseDetection
             .find({ user: userId })
@@ -99,6 +102,9 @@ export const getUserDiseaseImages = async (req, res) => {
 export const getUserPestImages = async (req, res) => {
     try {
         const { userId } = req.params;
+        if (String(userId) !== String(req.user._id)) {
+            throw new apiError(403, "You can only view your own scans");
+        }
 
         const detections = await PestDetection
             .find({ user: userId })
@@ -120,6 +126,9 @@ export const getUserPestImages = async (req, res) => {
 export const getUserDetectionImages = async (req, res) => {
     try {
         const { userId } = req.params;
+        if (String(userId) !== String(req.user._id)) {
+            throw new apiError(403, "You can only view your own scans");
+        }
 
         const [diseaseDetections, pestDetections] = await Promise.all([
             DiseaseDetection.find({ user: userId }).sort({ createdAt: -1 }),

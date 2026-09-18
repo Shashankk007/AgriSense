@@ -114,7 +114,7 @@ const CropPrediction = () => {
 
         {/* Map Panel */}
         <div className="lg:col-span-2">
-          <MapDrawer farmName="My Farm" onFarmSaved={handleFarmSaved} />
+          <MapDrawer farmName={`Farm ${farms.length + 1}`} onFarmSaved={handleFarmSaved} overlayTileUrl={ndviResult?.tileUrl} />
         </div>
 
         {/* Side Panel */}
@@ -140,7 +140,7 @@ const CropPrediction = () => {
               </li>
               <li className="flex gap-3">
                 <span className="text-green-600 font-bold shrink-0">4.</span>
-                Select your farm and click "Fetch NDVI" to get satellite analysis.
+                Select your farm and click "Fetch NDVI" — the NDVI layer appears on the map.
               </li>
             </ul>
           </div>
@@ -258,24 +258,11 @@ const CropPrediction = () => {
                 </div>
 
                 <div className="flex justify-between items-center">
-                  <span className="text-xs text-gray-500">Data Date</span>
+                  <span className="text-xs text-gray-500">Latest image</span>
                   <span className="text-xs text-gray-600">{new Date(ndviResult.lastUpdated).toLocaleDateString()}</span>
                 </div>
               </div>
 
-              <a
-                href={ndviResult.tileUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center gap-1.5 text-green-700 font-semibold text-xs hover:underline"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
-                  <polyline points="15 3 21 3 21 9" />
-                  <line x1="10" y1="14" x2="21" y2="3" />
-                </svg>
-                Open satellite tile preview
-              </a>
             </div>
           )}
 

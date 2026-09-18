@@ -1,17 +1,27 @@
-fastapi==0.114.1
-uvicorn[standard]==0.30.6
-earthengine-api==1.7.31
-pymongo==4.8.0
-python-dotenv==1.0.1
-
-# --- Chatbot Dependencies ---
-langchain
-langchain-core
-langchain-community
-langchain-google-genai
-langchain-mongodb
-langchain-text-splitters
-langchain-groq
-pydantic
-pydantic-settings
+# --- API framework ---
+fastapi>=0.114,<1
+uvicorn[standard]>=0.30,<1
 python-multipart
+
+# --- Config / validation ---
+pydantic>=2,<3
+pydantic-settings>=2,<3
+python-dotenv>=1.0,<2
+
+# --- Database ---
+pymongo>=4.8,<5
+
+# --- Google Earth Engine (NDVI) ---
+earthengine-api>=1.0,<2
+
+# --- LangChain / chatbot ---
+langchain>=0.3,<2
+langchain-core>=0.3,<2
+langchain-community>=0.3,<2
+langchain-google-genai>=2,<5
+langchain-mongodb>=0.6,<2
+langchain-text-splitters>=0.3,<2
+langchain-groq>=0.2,<2
+
+# --- Scripts (check_models.py, test.py, cli_chat.py) ---
+requests>=2.31,<3

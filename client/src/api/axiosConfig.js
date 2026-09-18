@@ -2,20 +2,35 @@ import axios from 'axios';
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_API_URL || 'http://localhost:5555/api',
-  withCredentials: true // This allows the browser to send cookies (including HttpOnly cookies) along with requests to the backend, enabling session management and authentication.
+  withCredentials: true // send the HttpOnly auth cookies with every request
 });
 
-// Debug interceptor — logs every request and every error response
-apiClient.interceptors.request.use((config) => {
-  console.log(`[API] ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`);
-  return config;
-});
+// Auth endpoints where a 401 is a real answer (bad credentials etc.), not an expired session.
+const NO_REFRESH_URLS = ['/auth/login', '/auth/register', '/auth/google-login', '/auth/refresh-token', '/auth/forgot-password', '/auth/reset-password'];
+
+// Share one in-flight refresh between concurrent requests.
+let refreshPromise = null;
 
 apiClient.interceptors.response.use(
   (response) => response,
-  (error) => {
-    console.error(`[API ERROR] ${error.config?.method?.toUpperCase()} ${error.config?.url}`, {
-      status: error.response?.status,
+  async (error) => {
+    const original = error.config;
+    const status = error.response?.status;
+    const skipRefresh = NO_REFRESH_URLS.some((u) => original?.url?.startsWith(u));
+
+    if (status === 401 && original && !original._retried && !skipRefresh) {
+      original._retried = true;
+      try {
+        refreshPromise = refreshPromise || apiClient.post('/auth/refresh-token').finally(() => { refreshPromise = null; });
+        await refreshPromise;
+        return apiClient(original); // retry with the fresh access-token cookie
+      } catch {
+        // refresh failed: session is really over, fall through to the original error
+      }
+    }
+
+    console.error(`[API ERROR] ${original?.method?.toUpperCase()} ${original?.url}`, {
+      status,
       data: error.response?.data,
     });
     return Promise.reject(error);

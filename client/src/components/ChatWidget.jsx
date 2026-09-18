@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { sendChatMessageAPI } from '../api/chatApi';
 
-const ChatWidget = () => {
+const ChatWidgetInner = () => {
   const { user } = useContext(AuthContext);
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
@@ -58,7 +58,8 @@ const ChatWidget = () => {
       ]);
       if (!isOpen) setHasNewMessage(true);
     } catch (err) {
-      const msg = err?.response?.data?.detail || 'Failed to connect to AI service.';
+      const detail = err?.response?.data?.detail;
+      const msg = typeof detail === 'string' ? detail : 'Failed to connect to AI service.';
       setError(msg);
     } finally {
       setLoading(false);
@@ -266,6 +267,12 @@ const ChatWidget = () => {
 
     </div>
   );
+};
+
+// Remount per signed-in user so chat history/conversation never leaks between accounts.
+const ChatWidget = () => {
+  const { user } = useContext(AuthContext);
+  return <ChatWidgetInner key={user?.id || user?._id || 'anonymous'} />;
 };
 
 export default ChatWidget;

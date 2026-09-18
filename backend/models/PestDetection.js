@@ -2,6 +2,13 @@ import mongoose from "mongoose";
 
 const pestDetectionSchema = new mongoose.Schema(
 {
+    user:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"User",
+        required:true,
+        index:true
+    },
+
     farmId:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Farm"
@@ -11,6 +18,8 @@ const pestDetectionSchema = new mongoose.Schema(
         type:String,
         required:true
     },
+
+    cloudinaryId:String,
 
     pestName:String,
 

@@ -73,11 +73,16 @@ class NDVIService:
         if average_ndvi is None:
             average_ndvi = 0
 
-        created_at = farm.get("createdAt")
-        last_updated = created_at.isoformat() if created_at else datetime.now(timezone.utc).isoformat()
+        # Date of the most recent Sentinel-2 scene that went into the composite.
+        latest_ms = collection.aggregate_max("system:time_start").getInfo()
+        if latest_ms:
+            last_updated = datetime.fromtimestamp(latest_ms / 1000, tz=timezone.utc).isoformat()
+        else:
+            last_updated = datetime.now(timezone.utc).isoformat()
 
         return {
             "tileUrl": tile_url,
+            "imageCount": collection.size().getInfo(),
             "averageNdvi": float(average_ndvi),
             "farmName": farm.get("farmName", "Unknown Farm"),
             "lastUpdated": last_updated,

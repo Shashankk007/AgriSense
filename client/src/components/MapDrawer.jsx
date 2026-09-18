@@ -7,7 +7,7 @@ import { AuthContext } from '../context/AuthContext';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 
-const MapDrawer = ({ farmName = 'My Farm', onFarmSaved }) => {
+const MapDrawer = ({ farmName = 'My Farm', onFarmSaved, overlayTileUrl }) => {
   const [mapLoaded, setMapLoaded] = useState(false);
   const [featureGroupInstance, setFeatureGroupInstance] = useState(null);
   
@@ -33,19 +33,27 @@ const MapDrawer = ({ farmName = 'My Farm', onFarmSaved }) => {
     const { layerType, layer } = e;
     if (layerType !== 'polygon') return;
 
+    // Farm names must be unique per user, so let the user choose one.
+    const chosenName = window.prompt('Name this farm:', farmName)?.trim();
+    if (!chosenName) {
+      layer.remove();
+      return;
+    }
+
     // Convert the drawn polygon's latlngs to the format required by our backend (GeoJSON-like)
     const coordinates = layer.getLatLngs()[0].map(latlng => [latlng.lng, latlng.lat]);
     coordinates.push(coordinates[0]); // Close the polygon by repeating the first coordinate at the end
 
     try {
       // API call to save the boundary securely in the database
-      const saved = await saveFarmBoundaryAPI(farmName, coordinates);
+      const saved = await saveFarmBoundaryAPI(chosenName, coordinates);
       console.log('Boundary saved API Response:', saved);
       onFarmSaved?.(saved.farm || saved.data || saved);
       alert("✅ Farm boundary securely saved to database!");
     } catch (err) {
       console.error('Failed to save boundary:', err);
-      alert("❌ Failed to save boundary. Please try again.");
+      layer.remove();
+      alert(`❌ ${err?.response?.data?.message || 'Failed to save boundary. Please try again.'}`);
     }
   };
 
@@ -72,6 +80,7 @@ const MapDrawer = ({ farmName = 'My Farm', onFarmSaved }) => {
           style={{ height: '100%', width: '100%' }}
         >
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          {overlayTileUrl && <TileLayer key={overlayTileUrl} url={overlayTileUrl} opacity={0.75} />}
 
           <FeatureGroup ref={setFeatureGroupRef}>
             {featureGroupInstance && (

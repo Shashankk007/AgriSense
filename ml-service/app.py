@@ -1,10 +1,12 @@
+import asyncio
 import os
+import secrets
 import time
 from contextlib import asynccontextmanager
 from typing import Optional
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pymongo import MongoClient
 
@@ -95,9 +97,15 @@ async def lifespan(app: FastAPI):
 
     # 3. Initialize NDVI Modules
     try:
-        mongo_db_name = os.getenv("MONGO_DB_NAME", "agrisense")
-        farm_collection = os.getenv("MONGO_FARM_COLLECTION", "farms")
-        mongo_db = mongo_client[mongo_db_name]
+        farm_collection = settings.MONGO_FARM_COLLECTION
+        if settings.MONGO_DB_NAME:
+            mongo_db = mongo_client[settings.MONGO_DB_NAME]
+        else:
+            try:
+                mongo_db = mongo_client.get_default_database()  # database named in MONGODB_URI (same one the Node backend uses)
+            except Exception:
+                mongo_db = mongo_client["test"]  # MongoDB's default when the URI names no database (what the Node backend uses)
+        logger.info("   Farms DB:   %s.%s", mongo_db.name, farm_collection)
         ndvi_service = NDVIService(mongo_db, farm_collection)
         
         init_mode = initialize_gee()
@@ -133,12 +141,12 @@ app = FastAPI(
 # --- CORS Middleware ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
+    allow_origins=list({
         "http://localhost:5173",
         "http://localhost:5176",
         "http://localhost:3000",
-        os.getenv("CORS_ORIGIN", "http://localhost:5173")
-    ],
+        os.getenv("CORS_ORIGIN", "http://localhost:5176"),
+    }),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -163,6 +171,18 @@ async def log_requests(request: Request, call_next):
         duration,
     )
     return response
+
+# ===================================================================
+# Admin authentication (for endpoints that must not be public)
+# ===================================================================
+
+def require_admin(x_admin_key: Optional[str] = Header(default=None)):
+    """Guards admin-only endpoints with the shared ML_ADMIN_KEY secret."""
+    expected = get_settings().ML_ADMIN_KEY
+    if not expected:
+        raise HTTPException(status_code=403, detail="Admin endpoints are disabled: set ML_ADMIN_KEY.")
+    if not x_admin_key or not secrets.compare_digest(x_admin_key, expected):
+        raise HTTPException(status_code=401, detail="Invalid or missing X-Admin-Key header.")
 
 # ===================================================================
 # Endpoints
@@ -223,7 +243,7 @@ async def chat(request: ChatRequest):
 
 # ---- Knowledge ----
 
-@app.post("/knowledge/upload", response_model=KnowledgeUploadResponse, tags=["Knowledge"])
+@app.post("/knowledge/upload", response_model=KnowledgeUploadResponse, tags=["Knowledge"], dependencies=[Depends(require_admin)])
 async def upload_knowledge(request: KnowledgeUploadRequest):
     """
     Upload a knowledge document to the vector store.
@@ -233,7 +253,7 @@ async def upload_knowledge(request: KnowledgeUploadRequest):
         raise HTTPException(status_code=503, detail="Service not initialized")
 
     try:
-        return knowledge_service.upload_knowledge(request)
+        return await asyncio.to_thread(knowledge_service.upload_knowledge, request)
     except Exception as e:
         logger.error("Knowledge upload error: %s", str(e), exc_info=True)
         raise HTTPException(
@@ -243,7 +263,7 @@ async def upload_knowledge(request: KnowledgeUploadRequest):
 
 # ---- Memory ----
 
-@app.post("/memory/store", response_model=MemoryStoreResponse, tags=["Memory"])
+@app.post("/memory/store", response_model=MemoryStoreResponse, tags=["Memory"], dependencies=[Depends(require_admin)])
 async def store_memory(request: MemoryStoreRequest):
     """
     Store a long-term fact about a user.
@@ -268,7 +288,7 @@ async def store_memory(request: MemoryStoreRequest):
             detail=f"Failed to store memory: {str(e)}",
         )
 
-@app.get("/memory/{user_id}", response_model=MemoryResponse, tags=["Memory"])
+@app.get("/memory/{user_id}", response_model=MemoryResponse, tags=["Memory"], dependencies=[Depends(require_admin)])
 async def get_memories(user_id: str):
     """
     Retrieve all stored memories for a user.
@@ -278,7 +298,7 @@ async def get_memories(user_id: str):
         raise HTTPException(status_code=503, detail="Service not initialized")
 
     try:
-        memories = long_term_memory.get_all_memories(user_id)
+        memories = await asyncio.to_thread(long_term_memory.get_all_memories, user_id)
         items = [
             MemoryItem(
                 fact=m["fact"],

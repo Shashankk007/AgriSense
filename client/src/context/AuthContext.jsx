@@ -46,9 +46,10 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       await logoutAPI(); // Tell backend to clear the HttpOnly cookie
-      setUser(null);     // Clear user from React memory
     } catch (error) {
       console.error("Error logging out", error);
+    } finally {
+      setUser(null);     // Always clear the local session, even if the server call failed
     }
   };
 

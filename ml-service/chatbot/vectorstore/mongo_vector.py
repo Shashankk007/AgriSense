@@ -44,6 +44,7 @@ class MongoVectorStore:
         self._embeddings = GoogleGenerativeAIEmbeddings(
             model=settings.EMBEDDING_MODEL,
             google_api_key=settings.GOOGLE_API_KEY,
+            output_dimensionality=settings.EMBEDDING_DIMENSIONS,
         )
 
         self._vector_store = MongoDBAtlasVectorSearch(

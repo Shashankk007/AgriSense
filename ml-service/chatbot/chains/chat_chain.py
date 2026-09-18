@@ -33,18 +33,27 @@ from chatbot.utils.logger import get_logger
 logger = get_logger(__name__)
 
 
-def get_llm() -> ChatGoogleGenerativeAI:
-    """
-    Initializes and returns the Gemini LLM instance.
-    Configuration (model name, temperature) comes from centralized settings.
-    """
+def _build_gemini(model: str, max_retries: int) -> ChatGoogleGenerativeAI:
     settings = get_settings()
     return ChatGoogleGenerativeAI(
-        model=settings.LLM_MODEL,
+        model=model,
         google_api_key=settings.GOOGLE_API_KEY,
         temperature=settings.LLM_TEMPERATURE,
-        convert_system_message_to_human=True,
+        max_retries=max_retries,
     )
+
+
+def get_llm():
+    """
+    Initializes the Gemini LLM. If LLM_FALLBACK_MODEL is set, a second model takes over
+    when the primary fails (e.g. 503 "high demand"), instead of making the user wait through retries.
+    """
+    settings = get_settings()
+    fallback = settings.LLM_FALLBACK_MODEL
+    if fallback and fallback != settings.LLM_MODEL:
+        primary = _build_gemini(settings.LLM_MODEL, max_retries=1)
+        return primary.with_fallbacks([_build_gemini(fallback, max_retries=2)])
+    return _build_gemini(settings.LLM_MODEL, max_retries=2)
 
 
 async def run_chat_chain(

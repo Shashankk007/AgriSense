@@ -1,0 +1,920 @@
+{
+  "0": {
+    "pest_name": "Rice Leaf Roller",
+    "crop": "Rice (Chawal)",
+    "description": "Yeh kida chawal ki pattiyo ko mod kar ek tube jaisa bana leta hai aur andar baithkar hara mada khata hai, jisse pattiyan safed ho jati hain.",
+    "remedies": [
+      "Chemical: Chlorpyrifos 20% EC ya Cartap Hydrochloride 50% SP ka spray karein.",
+      "Organic: Neem Seed Kernel Extract (NSKE) 5% ka chhidkav karein."
+    ]
+  },
+  "1": {
+    "pest_name": "Rice Leaf Caterpillar",
+    "crop": "Rice (Chawal)",
+    "description": "Yeh hara keeda chawal ki pattiyo ko kinare se kat-kat kar khata hai, jisse poudhe ki growth ruk jati hai.",
+    "remedies": [
+      "Chemical: Quinalphos 25% EC ka 200ml per acre spray karein.",
+      "Organic: Khet me pakshiyo (birds) ke baithne ke liye t-shaped lakdiya lagayein."
+    ]
+  },
+  "2": {
+    "pest_name": "Paddy Stem Maggot",
+    "crop": "Rice (Chawal)",
+    "description": "Yeh chawal ke tane (stem) ke andar ghus kar usko khata hai, jisse poudhe ka upari hissa sookh jata hai (Dead Heart).",
+    "remedies": [
+      "Chemical: Fipronil 5% SC ka mitti me chhidkav karein.",
+      "Preventive: Fasal katne ke baad khet ki gehri jutai (ploughing) karein."
+    ]
+  },
+  "3": {
+    "pest_name": "Asiatic Rice Borer",
+    "crop": "Rice (Chawal)",
+    "description": "Chawal ka ek khatarnak larva jo tane ko andar se khokhla karta hai, jisse baaliyan safed pad jati hain aur daane nahi bante.",
+    "remedies": [
+      "Chemical: Chlorantraniliprole 18.5% SC (Coragen) ka spray karein.",
+      "Organic: Pheromone traps ka istemal karein adult moths ko pakadne ke liye."
+    ]
+  },
+  "4": {
+    "pest_name": "Yellow Rice Borer",
+    "crop": "Rice (Chawal)",
+    "description": "Peele rang ki moth ka larva jo chawal ke tano ko mukhya roop se nursery aur tillering stage par barbaad karta hai.",
+    "remedies": [
+      "Chemical: Carbofuran 3G granules mitti mein milayein.",
+      "Organic: Trichogramma japonicum card khet me lagayein."
+    ]
+  },
+  "5": {
+    "pest_name": "Rice Gall Midge",
+    "crop": "Rice (Chawal)",
+    "description": "Yeh kida poudhe ki branch ko ek lambi, pyaz ki patti (onion leaf) jaisi nali me badal deta hai jisse tillers nahi bante.",
+    "remedies": [
+      "Chemical: Thiamethoxam 25% WG ka spray karein.",
+      "Preventive: Khet me ghaas aur kharpatwar (weeds) ko poori tarah saaf rakhein."
+    ]
+  },
+  "6": {
+    "pest_name": "Rice Stemfly",
+    "crop": "Rice (Chawal)",
+    "description": "Choti makkhi jaisa kida jo naye uge hue chawal ke poudho ke tano me ande deta hai aur andar se unhe khatam karta hai.",
+    "remedies": [
+      "Chemical: Imidacloprid 17.8% SL ka chhidkav karein.",
+      "Preventive: Sahi samay par jaldi buwai (early sowing) karein."
+    ]
+  },
+  "7": {
+    "pest_name": "Brown Plant Hopper",
+    "crop": "Rice (Chawal)",
+    "description": "Yeh kida poudhe ke nichle hisse se ras choosta hai, jisse poori fasal ek sath sookh kar jal jati hai jise 'Hopper Burn' kehte hain.",
+    "remedies": [
+      "Chemical: Pymetrozine 50% WG ya Dinotefuran 20% SG use karein.",
+      "Organic: Neem oil 1500 PPM ka tana (stem) ke paas spray karein."
+    ]
+  },
+  "8": {
+    "pest_name": "White Backed Plant Hopper",
+    "crop": "Rice (Chawal)",
+    "description": "Safed peeth wala kida jo jado ke thoda upar se ras choosta hai, jisse poudha peela pad jata hai aur uski growth rukti hai.",
+    "remedies": [
+      "Chemical: Buprofezin 25% SC ka spray karein.",
+      "Preventive: Khet se paani nikal kar 3-4 din tak zameen ko sookhne dein."
+    ]
+  },
+  "9": {
+    "pest_name": "Small Brown Plant Hopper",
+    "crop": "Rice (Chawal)",
+    "description": "Chota bhoore rang ka kida jo ras choosne ke sath-sath chawal me khatarnak viral bimariya failata hai.",
+    "remedies": [
+      "Chemical: Clothianidin 50% WDG ka spray karein.",
+      "Preventive: Nitrogen (Urea) khad ka zyada aur be-hisaab istemal na karein."
+    ]
+  },
+  "10": {
+    "pest_name": "Rice Water Weevil",
+    "crop": "Rice (Chawal)",
+    "description": "Yeh kida chawal ki jado (roots) ko paani ke andar khata hai, jisse poudha chota reh jata hai aur ukhad jata hai.",
+    "remedies": [
+      "Chemical: Thiamethoxam ya Fipronil ka khad ke sath milakar use karein.",
+      "Preventive: Paani ka management sahi rakhein, khet ko dhoop lagne dein."
+    ]
+  },
+  "11": {
+    "pest_name": "Rice Leafhopper",
+    "crop": "Rice (Chawal)",
+    "description": "Hare rang ka udne wala chota kida jo pattiyo se ras choosta hai aur Tungro virus failata hai.",
+    "remedies": [
+      "Chemical: Acephate 75% SP ya Monocrotophos ka spray karein.",
+      "Organic: Neem formulations ka regular use karein."
+    ]
+  },
+  "12": {
+    "pest_name": "Grain Borer",
+    "crop": "Wheat/Rice (Gehu/Chawal)",
+    "description": "Yeh kida fasal katne ke baad godam (storage) me rakhe anaj ke daano ko andar se khakar powder bana deta hai.",
+    "remedies": [
+      "Chemical: Storage room me Aluminum Phosphide ki goliya (fumigation) use karein.",
+      "Preventive: Anaj ko store karne se pehle dhoop me achhi tarah sukhayein."
+    ]
+  },
+  "13": {
+    "pest_name": "Rice Bug",
+    "crop": "Rice (Chawal)",
+    "description": "Yeh kida chawal ke kachhe daano (milky stage) me se ras choos leta hai, jisse daane badrang aur khali reh jate hain.",
+    "remedies": [
+      "Chemical: Malathion 5% Dusting powder ka subah ke samay khet me chhidkav karein.",
+      "Organic: Sadi hui machli ka trap banakar khet ke chaaro taraf lagayein."
+    ]
+  },
+  "14": {
+    "pest_name": "Wheat Blossom Midge",
+    "crop": "Wheat (Gehu)",
+    "description": "Choti makkhi jo gehu ke phoolo me ande deti hai, jisse daane sikud jate hain ya bante hi nahi.",
+    "remedies": [
+      "Chemical: Lambda-Cyhalothrin 5% EC ka spray earhead emergence stage par karein.",
+      "Preventive: Resistant wheat varieties ka hi chunav karein."
+    ]
+  },
+  "15": {
+    "pest_name": "Wheat Phloeothrips",
+    "crop": "Wheat (Gehu)",
+    "description": "Gehu ki baaliyo ka ras choosne wale thrips, jisse baaliyan safed ho jati hain aur daane kamzor bante hain.",
+    "remedies": [
+      "Chemical: Dimethoate 30% EC ya Fipronil 5% SC ka chhidkav karein.",
+      "Organic: Blue sticky traps khet me lagayein."
+    ]
+  },
+  "16": {
+    "pest_name": "Wheat Sawfly",
+    "crop": "Wheat (Gehu)",
+    "description": "Is kide ke larvae gehu ke tane ko andar se kaat dete hain, jisse thodi bhi hawa chalne par poudha gir jata hai.",
+    "remedies": [
+      "Chemical: Profenofos + Cypermethrin ka combo spray karein.",
+      "Preventive: Fasal katne ke baad bache hue thunth (stubble) ko jala dein ya mitti me daba dein."
+    ]
+  },
+  "17": {
+    "pest_name": "Wheat Leaf Miner",
+    "crop": "Wheat (Gehu)",
+    "description": "Yeh kida gehu ki pattiyo ke dono part ke beech me surang banata hai, jisse poudha khana nahi bana pata aur peela padta hai.",
+    "remedies": [
+      "Chemical: Abamectin 1.9% EC ka spray karein.",
+      "Organic: Neem seed kernel extract (NSKE) 5% chhidkein."
+    ]
+  },
+  "18": {
+    "pest_name": "Wheat Aphid",
+    "crop": "Wheat (Gehu)",
+    "description": "Chote hare ya kaale kide jo baaliyo par chipke rehte hain aur ras chooste hain, jisse chipchipa substance banta hai.",
+    "remedies": [
+      "Chemical: Thiamethoxam 25% WG ya Imidacloprid ka spray karein.",
+      "Organic: Ladybird beetles (faydemand kide) ko khet me badhava dein."
+    ]
+  },
+  "19": {
+    "pest_name": "Wireworm",
+    "crop": "Wheat/Corn (Gehu/Makka)",
+    "description": "Zameen ke andar rehne wale sakht peele larvae jo ugate hue beejon aur jado ko kha kar poora poudha khatam kar dete hain.",
+    "remedies": [
+      "Chemical: Seed Treatment (Beej upchar) karein Imidacloprid ya Thiamethoxam se.",
+      "Preventive: Khet ki garmio me gehri jutai karein taaki larvae dhoop se mar jayein."
+    ]
+  },
+  "20": {
+    "pest_name": "Cutworm",
+    "crop": "Corn/Wheat (Makka/Gehu)",
+    "description": "Raat mein active rehne wale yeh kaale larvae naye poudho ko zameen ki satah (ground level) se kaat dete hain, jisse poora poudha gir jata hai.",
+    "remedies": [
+      "Chemical: Chlorpyrifos 20% EC ko mitti mein milayein ya shaam ke samay poudho ki jado ke paas spray karein.",
+      "Organic: Poudho ke tano ke chaaro taraf physical barriers (cardboard collars) lagayein."
+    ]
+  },
+  "21": {
+    "pest_name": "Fall Armyworm",
+    "crop": "Corn (Makka)",
+    "description": "Makke ki fasal ka sabse bhayankar kida jo pattiyo ko chhalni kar deta hai aur bhutte (cob) ke andar ghus kar daano ko tabah karta hai.",
+    "remedies": [
+      "Chemical: Emamectin Benzoate 5% SG ya Spinetoram 11.7% SC (Delegate) ka spray karein.",
+      "Organic: Pheromone traps lagayein aur mitti ya lakdi ki raakh ko makke ke whorl (beech wale hisse) mein dalein."
+    ]
+  },
+  "22": {
+    "pest_name": "Corn Earworm",
+    "crop": "Corn (Makka)",
+    "description": "Yeh kida makke ke baalo (silks) par ande deta hai aur larvae bhutte ke andar ghus kar upari daano ko makkhan ki tarah chat kar jate hain.",
+    "remedies": [
+      "Chemical: Flubendiamide 480 SC (Fame) ka spray silk nikalte hi karein.",
+      "Organic: Neem oil 3000 PPM ka spray bhutte ke muh par karein."
+    ]
+  },
+  "23": {
+    "pest_name": "Corn Rootworm",
+    "crop": "Corn (Makka)",
+    "description": "Zameen ke andar iske larvae makke ki jado ko poori tarah utar dete hain, jisse poudha kamzor hokar tedha (goosenecking) ho jata hai.",
+    "remedies": [
+      "Chemical: Bifenthrin 10% EC granules ko buwai ke samay mitti mein dalein.",
+      "Preventive: Fasal chakkar (Crop Rotation) apnaein, lagatar makka na boyein."
+    ]
+  },
+  "24": {
+    "pest_name": "Corn Borer",
+    "crop": "Corn (Makka)",
+    "description": "Yeh kida makke ke tane ke andar surang banata hai, jisse tane toot jate hain aur poudhe ko nutrition milna band ho jata hai.",
+    "remedies": [
+      "Chemical: Chlorantraniliprole 18.5% SC ka chhidkav whorl stage par karein.",
+      "Organic: Trichogramma chilonis ke parasited cards khet mein lagayein."
+    ]
+  },
+  "25": {
+    "pest_name": "Corn Leaf Aphid",
+    "crop": "Corn (Makka)",
+    "description": "Chote neele-hare kide jo makke ke whorl aur pattiyo par guchho mein rehkar ras chooste hain, jisse pattiya ghumavdar ho jati hain.",
+    "remedies": [
+      "Chemical: Dimethoate 30% EC ya Imidacloprid ka spray karein.",
+      "Organic: Tez pani ki dhar se poudho ko dhoein taaki aphid gir jayein."
+    ]
+  },
+  "26": {
+    "pest_name": "Corn Flea Beetle",
+    "crop": "Corn (Makka)",
+    "description": "Chote kaale beetles jo pattiyo par kootte hain aur unhe khakar unpar safed lakerien (Stewart's Wilt bimari) failate hain.",
+    "remedies": [
+      "Chemical: Thiamethoxam 25% WG ka chhidkav karein.",
+      "Preventive: Thand ke mausam mein khet ki safai achhe se karein."
+    ]
+  },
+  "27": {
+    "pest_name": "Alfalfa Weevil",
+    "crop": "Alfalfa (Rizhka / Chara)",
+    "description": "Chare ki fasal ka pramukh kida, iske larvae pattiyo ke tissue ko khakar unhe bilkul jali jaisa banakar sookha dete hain.",
+    "remedies": [
+      "Chemical: Indoxacarb 14.5% SC ya Malathion 50% EC use karein.",
+      "Preventive: Fasal ki samay se pehle jaldi katai (early cutting) kar dein taaki larvae mar jayein."
+    ]
+  },
+  "28": {
+    "pest_name": "Alfalfa Plant Bug",
+    "crop": "Alfalfa (Rizhka / Chara)",
+    "description": "Yeh kida chare ke naye shubho aur phoolo se ras choosta hai, jisse phool gir jate hain aur beej nahi bante.",
+    "remedies": [
+      "Chemical: Alpha-cypermethrin 10% EC ka spray karein.",
+      "Organic: Khet mein faydemand kide jaise Damsel bugs ko badhava dein."
+    ]
+  },
+  "29": {
+    "pest_name": "Tarnished Plant Bug",
+    "crop": "Alfalfa/Cotton (Chara/Kapaas)",
+    "description": "Bhoore rang ka kida jo poudhe ke badne wale hisso mein apna zehriala thook dalta hai, jisse pattiya aur phool jal jate hain.",
+    "remedies": [
+      "Chemical: Acephate 75% SP ya Flonicamid 50% WG ka use karein.",
+      "Organic: Khet ke aas-paas ki kharpatwar (weeds) ko poori tarah saaf rakhein."
+    ]
+  },
+  "30": {
+    "pest_name": "Locust",
+    "crop": "All Crops (Tiddi Dal)",
+    "description": "Khatarnak tiddiyo ka jhund jo lakho ki sankhya mein aata hai aur dekhte hi dekhte poori ki poori hari fasal ko chatt kar jata hai.",
+    "remedies": [
+      "Chemical: Lambda-Cyhalothrin 5% EC ya Malathion 95% ULV ka badi machines se aerial spray karein.",
+      "Preventive: Subah ke samay jab tiddiyan zameen par hon, tabhi unpar chemical chhidak dein."
+    ]
+  },
+  "31": {
+    "pest_name": "Grasshopper",
+    "crop": "All Crops (Tidda)",
+    "description": "Fasal ki pattiyo ko kinaro se bade-bade tukdo mein khane wala kida, jo anaj aur chare dono ko nuksan pahunchata hai.",
+    "remedies": [
+      "Chemical: Fipronil 5% SC ya Cypermethrin 25% EC ka chhidkav karein.",
+      "Organic: Khet ke medh (borders) par mitti ko khodkar unke ando ko destroy karein."
+    ]
+  },
+  "32": {
+    "pest_name": "Cricket",
+    "crop": "Vegetables/Grains (Jhingur)",
+    "description": "Raat ke samay mitti se nikal kar naye uge poudho ki pattiyo aur tano ko katarne wala kida.",
+    "remedies": [
+      "Chemical: Malathion dust powder ko shaam ko khet ke medh par daalein.",
+      "Preventive: Khet mein paani dalkar unke bil (holes) ko band karein."
+    ]
+  },
+  "33": {
+    "pest_name": "Mole Cricket",
+    "crop": "Roots/Lawns (Mitti ka Jhingur)",
+    "description": "Yeh kida zameen ke andar surang banata hai aur poudho ki jado (roots) ko katata hai, jisse poudhe sookh kar ukhad jate hain.",
+    "remedies": [
+      "Chemical: Imidacloprid granules ko mitti mein milakar halki sinchai (watering) karein.",
+      "Organic: Neem cake powder (Neem ki khali) mitti mein taiyari ke samay dalein."
+    ]
+  },
+  "34": {
+    "pest_name": "White Grub",
+    "crop": "All Crops (Gobar Bhrang)",
+    "description": "Zameen ke andar rehne wala C-shape ka safed kida jo mukhya roop se jado ko khata hai, jisse poudha achanak sookh jata hai.",
+    "remedies": [
+      "Chemical: Phorate 10G ya Chlorpyrifos 20% EC ko gobar ki khad mein milakar zameen mein dalein.",
+      "Preventive: Khet mein hamesha achhi tarah sadi hui gobar ki khad hi dalein, kachhi khad na dalein."
+    ]
+  },
+  "35": {
+    "pest_name": "Flea Beetle",
+    "crop": "Vegetables (Chhota Beetle)",
+    "description": "Chote chamakdar beetles jo pattiyo par hazaro chote-chote ched (shot-holes) kar dete hain, jisse pattiya chhalni jaisi dikhti hain.",
+    "remedies": [
+      "Chemical: Acetamiprid 20% SP ya Spinosad 45% SC ka spray karein.",
+      "Organic: Yellow sticky traps khet mein lagayein aur neem oil ka chhidkav karein."
+    ]
+  },
+  "36": {
+    "pest_name": "Cabbage Looper",
+    "crop": "Cabbage (Patta Gobhi)",
+    "description": "Y-shape mein chalne wala hara larva jo gobhi ki pattiyo mein bade-bade ched karta hai aur gobhi ke phool ke andar ghus jata hai.",
+    "remedies": [
+      "Chemical: Indoxacarb 14.5% SC ya Bacillus thuringiensis (Bt) powder ka spray karein.",
+      "Organic: Neem Seed Kernel Extract (NSKE) 5% ka chhidkav karein."
+    ]
+  },
+  "37": {
+    "pest_name": "Cabbage Moth",
+    "crop": "Cabbage/Broccoli (Gobhi)",
+    "description": "Iske larvae gobhi ke poudhe ke bilkul beech wale naye hisse (head) ko khate hain, jisse gobhi ka phool ban hi nahi pata.",
+    "remedies": [
+      "Chemical: Flubendiamide 39.35% SC ka chhidkav karein.",
+      "Organic: Mustard (Sarso) ko trap crop ki tarah gobhi ke chaaro taraf boyein."
+    ]
+  },
+  "38": {
+    "pest_name": "Cabbage Butterfly",
+    "crop": "Cabbage/Mustard (Safed Titli)",
+    "description": "Safed titli ke chittidar hare larvae jo jhund mein aakar patta gobhi aur phool gobhi ki saari pattiyan kha jate hain, bas nasein (veins) bachti hain.",
+    "remedies": [
+      "Chemical: Quinalphos 25% EC ya Cypermethrin ka spray karein.",
+      "Organic: Larvae ko haath se chun kar (handpicking) keerosine wale pani mein daal dein."
+    ]
+  },
+  "39": {
+    "pest_name": "Cabbage Aphid",
+    "crop": "Cabbage/Mustard (Mahu / Lahi)",
+    "description": "Safed-bhoore rang ke chote kide jo gobhi aur sarso ke phoolo aur pattiyo ka poora ras choos kar unhe chipchipa aur kamzor bana dete hain.",
+    "remedies": [
+      "Chemical: Thiamethoxam 25% WG ya Dimethoate 30% EC ka use karein.",
+      "Organic: Sabun ke paani (Liquid soap solution) ya Neem oil ka heavy spray karein."
+    ]
+  },
+  "40": {
+    "pest_name": "Cabbage Webworm",
+    "crop": "Cabbage/Radish (Gobhi/Mooli)",
+    "description": "Yeh kida gobhi ya mooli ki naye pattiyo par jaala (web) banakar andar baithta hai aur poudhe ke main growing point ko khakar use khatam kar deta hai.",
+    "remedies": [
+      "Chemical: Cypermethrin 10% EC ya Emamectin Benzoate 5% SG ka spray jaale par karein.",
+      "Organic: Neem Seed Kernel Extract (NSKE) 5% ka chhidkav suruat mein karein."
+    ]
+  },
+  "41": {
+    "pest_name": "Cabbage Flea Beetle",
+    "crop": "Cabbage/Mustard (Gobhi/Sarso)",
+    "description": "Chote kaale rang ke beetles jo pattiyo par kootte hain aur unme sekdo chote ched kar dete hain, jisse naye poudhe sookh jate hain.",
+    "remedies": [
+      "Chemical: Acetamiprid 20% SP ya Thiamethoxam 25% WG spray karein.",
+      "Organic: Khet me yellow sticky traps lagayein aur mitti me neem ki khali milayein."
+    ]
+  },
+  "42": {
+    "pest_name": "Radish Aphid",
+    "crop": "Radish/Turnip (Mooli/Shaljam)",
+    "description": "Mooli ki pattiyo ke nichle hisse par chipke rehne wale chote kide jo ras chooste hain, jisse pattiya peeli padkar mud jati hain.",
+    "remedies": [
+      "Chemical: Dimethoate 30% EC ya Imidacloprid 17.8% SL ka spray karein.",
+      "Organic: Tez dhar wale paani se pattiyo ko saaf karein ya neem oil spray use karein."
+    ]
+  },
+  "43": {
+    "pest_name": "Mustard Aphid",
+    "crop": "Mustard (Sarso)",
+    "description": "Sarso ki fasal ka sabse bada dushman (Mahu/Cheepa). Yeh phoolo aur faliyo (pods) ka saara ras choos leta hai, jisse tel ki matra aur paidaar gir jati hai.",
+    "remedies": [
+      "Chemical: Thiamethoxam 25% WG ya Oxydemeton-methyl 25% EC ka chhidkav karein.",
+      "Organic: Khet me ladybird beetles ko badhava dein aur subah ke samay light traps chalayein."
+    ]
+  },
+  "44": {
+    "pest_name": "Soybean Aphid",
+    "crop": "Soybean",
+    "description": "Chote peele-hare kide jo soybean ki nayi pattiyo aur tano se guchho me rehkar ras chooste hain aur poudhe ki growth rok dete hain.",
+    "remedies": [
+      "Chemical: Lambda-Cyhalothrin 4.9% CS ya Thiacloprid ka spray karein.",
+      "Organic: Potassium soap ya neem based insecticide ka spray karein."
+    ]
+  },
+  "45": {
+    "pest_name": "Soybean Pod Borer",
+    "crop": "Soybean",
+    "description": "Yeh kida soybean ki faliyo (pods) ke andar ched karke ghus jata hai aur andar ke daano ko khakar faliyo ko khali kar deta hai.",
+    "remedies": [
+      "Chemical: Flubendiamide 39.35% SC (Fame) ya Indoxacarb 14.5% SC ka spray fali bante waqt karein.",
+      "Organic: Pheromone traps lagayein moths ko attract karne ke liye."
+    ]
+  },
+  "46": {
+    "pest_name": "Soybean Looper",
+    "crop": "Soybean",
+    "description": "Yeh caterpillar poudhe par lachakkar chalta hai aur soybean ki pattiyo ko beech se khakar unme bade-bade holes bana deta hai.",
+    "remedies": [
+      "Chemical: Chlorantraniliprole 18.5% SC (Coragen) ka spray karein.",
+      "Organic: Bacillus thuringiensis (Bt) formulation ka use karein."
+    ]
+  },
+  "47": {
+    "pest_name": "Soybean Leafminer",
+    "crop": "Soybean",
+    "description": "Is kide ka larva soybean ki pattiyo ke andar jaakar safed ya bhoore rang ki surang (mines) banata hai, jisse pattiya sookh kar gir jati hain.",
+    "remedies": [
+      "Chemical: Profenofos 50% EC ya Triazophos 40% EC ka use karein.",
+      "Organic: Neem seed kernel extract ka 5% solution spray karein."
+    ]
+  },
+  "48": {
+    "pest_name": "Peanut Aphid",
+    "crop": "Peanut (Moongfali)",
+    "description": "Moongfali ke poudhe ke upari hisse aur phoolo par aane wala kaala kida jo ras choosta hai aur Rosette virus jaisi bimari failata hai.",
+    "remedies": [
+      "Chemical: Imidacloprid 17.8% SL ya Acetamiprid ka use karein.",
+      "Organic: Neem oil 1500 PPM ka heavy spray sham ke samay karein."
+    ]
+  },
+  "49": {
+    "pest_name": "Peanut Leafminer",
+    "crop": "Peanut (Moongfali)",
+    "description": "Moongfali ka ek ghatak kida jiska larva pattiyo me ghuskar unhe andar se khata hai, jisse khet door se dekhne par jala hua lagta hai.",
+    "remedies": [
+      "Chemical: Quinalphos 25% EC ya Dimethoate 30% EC spray karein.",
+      "Preventive: Moongfali ke sath Bajra ya Lablab ki intercropping karein."
+    ]
+  },
+  "50": {
+    "pest_name": "Cotton Bollworm",
+    "crop": "Cotton (Kapaas)",
+    "description": "Kapaas ka sabse bada dushman (American Bollworm). Yeh kapaas ke dodo (bolls) me ched karke apna aadha sharir andar daal kar rui aur beej ko barbad karta hai.",
+    "remedies": [
+      "Chemical: Spinosad 45% SC ya Emamectin Benzoate 5% SG ka spray karein.",
+      "Organic: Helicoverpa armigera pheromone traps 5 per acre lagayein."
+    ]
+  },
+  "51": {
+    "pest_name": "Cotton Aphid",
+    "crop": "Cotton (Kapaas)",
+    "description": "Chote peele, hare ya kaale kide jo kapaas ki pattiyo ke piche rehkar ras chooste hain, jisse pattiya niche ki taraf mud jati hain.",
+    "remedies": [
+      "Chemical: Flonicamid 50% WG ya Thiamethoxam ka spray karein.",
+      "Organic: Chrysoperla carnea (faydemand kide) ke eggs khet me chodein."
+    ]
+  },
+  "52": {
+    "pest_name": "Cotton Jassid",
+    "crop": "Cotton (Kapaas)",
+    "description": "Yeh kida pattiyo se ras chooste waqt apna toxic saliva andar dalta hai, jisse kapaas ki pattiya kinaro se peeli aur fir laal hokar sookh jati hain (Hopper Burn).",
+    "remedies": [
+      "Chemical: Dinotefuran 20% SG ya Imidacloprid ka spray karein.",
+      "Organic: Neem oil spray karein aur yellow sticky cards lagayein."
+    ]
+  },
+  "53": {
+    "pest_name": "Cotton Whitefly",
+    "crop": "Cotton (Kapaas)",
+    "description": "Safed rang ki choti makkhi jo kapaas ki pattiyo ka ras choosne ke sath-sath Leaf Curl Virus failati hai, jo poori fasal tabah kar sakta hai.",
+    "remedies": [
+      "Chemical: Pyriproxyfen 10% EC ya Afidopyropen 50 g/l DC ka spray karein.",
+      "Preventive: Khet ke aas-paas se safed makkhi ko asra dene wale weeds hataiyein."
+    ]
+  },
+  "54": {
+    "pest_name": "Cotton Leaf Roller",
+    "crop": "Cotton (Kapaas)",
+    "description": "Is kide ka larva kapaas ki patti ko roll karke ek funnel jaisa banata hai aur usko andar se khata rehta hai.",
+    "remedies": [
+      "Chemical: Profenofos + Cypermethrin combo insecticide ka use karein.",
+      "Organic: Rolled pattiyo ko manually todkar khet se door phenk dein."
+    ]
+  },
+  "55": {
+    "pest_name": "Cotton Mealybug",
+    "crop": "Cotton (Kapaas)",
+    "description": "Safed powder jaise layer se dhaka hua kida jo kapaas ke tano aur dodo par chipak kar unka poora khoon (sap) choos leta hai, jisse poudha mar jata hai.",
+    "remedies": [
+      "Chemical: Profenofos 50% EC ya Buprofezin 25% SC ka spray surf ke pani ke sath milakar karein.",
+      "Organic: Khet ke medh par se cheentiyo (ants) ke gharo ko saf karein, kyunki cheentiyan mealybug ko spread karti hain."
+    ]
+  },
+  "56": {
+    "pest_name": "Sugarcane Borer",
+    "crop": "Sugarcane (Ganna)",
+    "description": "Ganne ke tane (stem) ya top shoot me andar ghuskar khane wala kida, jisse ganne ke andar laal rang ka kachra ban jata hai aur ganne ka weight kam ho jata hai.",
+    "remedies": [
+      "Chemical: Chlorantraniliprole 0.4% G (Ferterra) ko buwai ke samay mitti me dalein.",
+      "Organic: Trichogramma chilonis ke trichocards khet me har 15 din me lagayein."
+    ]
+  },
+  "57": {
+    "pest_name": "Sugarcane Aphid",
+    "crop": "Sugarcane (Ganna)",
+    "description": "Bhoore-peele rang ke kide jo ganne ki pattiyo ke niche hazaro ki sankhya me chipak kar ras chooste hain, jisse chini ki matra (sucrose) ghat jati hai.",
+    "remedies": [
+      "Chemical: Dimethoate 30% EC ya Acephate 75% SP ka chhidkav karein.",
+      "Organic: Khet me regular dhoop aur hawa aane ke liye sookhi pattiyo ko nikalte rahein (detrashing)."
+    ]
+  },
+  "58": {
+    "pest_name": "Sugarcane Pyrilla",
+    "crop": "Sugarcane (Ganna)",
+    "description": "Ganne ka patanga (Leafhopper) jo poudhe ka juice choosta hai. Iske body se nikalne wale honey-dew ke karan pattiyo par kaali fafundi (Sooty Mold) jam jati hai.",
+    "remedies": [
+      "Chemical: Monocrotophos 36% SL ya Quinalphos ka spray karein.",
+      "Organic: Epiricania melanoleuca (ek faydemand parajivi kida) ke cocoons khet me chodein jo pyrilla ko natural tarike se khatam karta hai."
+    ]
+  },
+  "59": {
+    "pest_name": "Sugarcane Whitefly",
+    "crop": "Sugarcane (Ganna)",
+    "description": "Safed makkhi jo ganne ki nichli pattiyo se juice choosti hai, jisse ganna peela pad jata hai aur uski growth ruk jati hai.",
+    "remedies": [
+      "Chemical: Imidacloprid 17.8% SL ya Malathion 50% EC ka use karein.",
+      "Preventive: Nitrogen (Urea) ka balance use karein aur khet me paani na rukne dein."
+    ]
+  },
+  "60": {
+    "pest_name": "Sugarcane Mealybug",
+    "crop": "Sugarcane (Ganna)",
+    "description": "Yeh kida ganne ke tano par jahan patti judi hoti hai (nodes), wahan gulabi-safed powder jaisi layer banakar chipak jata hai aur ganne ka ras choosta hai.",
+    "remedies": [
+      "Chemical: Thiamethoxam 25% WG ya Profenofos 50% EC ka spray karein.",
+      "Preventive: Ganne ki buwai se pehle beej (setts) ko insecticide solution se treat karein."
+    ]
+  },
+  "61": {
+    "pest_name": "Sugarcane Scale",
+    "crop": "Sugarcane (Ganna)",
+    "description": "Chote bhoore-kaale rang ke prapati (scale) kide jo ganne ke poore tane ko cover kar lete hain, jisse ganna sookh jata hai aur juice khatam ho jata hai.",
+    "remedies": [
+      "Chemical: Dimethoate 30% EC ya Malathion ka heavy chhidkav karein.",
+      "Preventive: Khet me lagatar pani ka bahaav sahi rakhein aur sadi hui pattiyan nikalte rahein."
+    ]
+  },
+  "62": {
+    "pest_name": "Tomato Fruitworm",
+    "crop": "Tomato (Tamatar)",
+    "description": "Tamatar ka sabse bada dushman larva. Yeh tamatar ke phal me ched (hole) karke andar ghus jata hai aur use andar se khakar poora sada deta hai.",
+    "remedies": [
+      "Chemical: Flubendiamide 39.35% SC (Fame) ya Indoxacarb ka spray karein.",
+      "Organic: Tamatar ke khet me beech-beech me Genda (Marigold) ke poudhe lagayein, taaki adult butterfly wahan ande de."
+    ]
+  },
+  "63": {
+    "pest_name": "Tomato Hornworm",
+    "crop": "Tomato (Tamatar)",
+    "description": "Bade size ka hara caterpillar jiski peeth par ek sing (horn) jaisa hota hai. Yeh tamatar ki pattiya aur naye tano ko boht tezi se chat kar jata hai.",
+    "remedies": [
+      "Chemical: Spinosad 45% SC ya Emamectin Benzoate ka chhidkav karein.",
+      "Organic: In bade kido ko haath se chun kar (handpicking) sabun wale pani me daal kar khatam karein."
+    ]
+  },
+  "64": {
+    "pest_name": "Tomato Pinworm",
+    "crop": "Tomato (Tamatar)",
+    "description": "Chota larva jo tamatar ki pattiyo me surang banata hai aur phal ke bilkul top (calyx) ke paas pin jaisa ched karke andar ghus jata hai.",
+    "remedies": [
+      "Chemical: Chlorantraniliprole 18.5% SC ka spray karein.",
+      "Organic: Pheromone traps ka use karke adult moths ko control karein."
+    ]
+  },
+  "65": {
+    "pest_name": "Tomato Aphid",
+    "crop": "Tomato (Tamatar)",
+    "description": "Chote hare aur gulabi rang ke kide jo tamatar ke naye shubho aur pattiyo ka ras chooste hain, jisse poudha peela aur kamzor pad jata hai.",
+    "remedies": [
+      "Chemical: Imidacloprid 17.8% SL ya Acetamiprid ka use karein.",
+      "Organic: Neem oil 1500 PPM ka spray regular interval par karein."
+    ]
+  },
+  "66": {
+    "pest_name": "Potato Beetle",
+    "crop": "Potato (Aaloo)",
+    "description": "Colorado Potato Beetle - Peeli-kaali lakeron wala beetle jo aaloo ki pattiyo ko poori tarah khakar fasal ko thunth (skeletonize) bana deta hai.",
+    "remedies": [
+      "Chemical: Thiamethoxam 25% WG ya Cyantraniliprole ka use karein.",
+      "Organic: Bacillus thuringiensis (Bt) ka chhidkav naye larvae par karein."
+    ]
+  },
+  "67": {
+    "pest_name": "Potato Aphid",
+    "crop": "Potato (Aaloo)",
+    "description": "Aaloo ki pattiyo par aane wala kida jo ras choosne ke alawa Potato Leaf Roll Virus failata hai, jisse aaloo ka size boht chota reh jata hai.",
+    "remedies": [
+      "Chemical: Flonicamid 50% WG ya Thiacloprid ka spray karein.",
+      "Organic: Yellow sticky traps khet me lagayein wingless aphids ko trace karne ke liye."
+    ]
+  },
+  "68": {
+    "pest_name": "Potato Tuberworm",
+    "crop": "Potato (Aaloo)",
+    "description": "Yeh kida khet me mitti ke andar ya storage (cold storage) me aaloo ke kando (tubers) me surang bana deta hai, jisse aaloo bekar ho jata hai.",
+    "remedies": [
+      "Chemical: Quinalphos 25% EC ka spray mitti par aur poudhe par karein.",
+      "Preventive: Aaloo par mitti chadhane (earthing up) ka kaam achhe se karein taaki aaloo zameen se bahr na dikhe."
+    ]
+  },
+  "69": {
+    "pest_name": "Potato Leafhopper",
+    "crop": "Potato (Aaloo)",
+    "description": "Hare rang ka kida jo aaloo ki pattiyo se ras chooste waqt toxin chhodta hai, jisse pattiyan kinaro se peeli hokar andar ki taraf mud jati hain (Hopper Burn).",
+    "remedies": [
+      "Chemical: Dinotefuran 20% SG ya Acetamiprid 20% SP ka chhidkav karein.",
+      "Organic: Neem oil aur liquid soap ka mix spray karein."
+    ]
+  },
+  "70": {
+    "pest_name": "Onion Thrips",
+    "crop": "Onion (Pyaz)",
+    "description": "Boht hi chote lambe kide jo pyaz ki pattiyo ke beech me chhup kar unhe khurach-khurach kar ras chooste hain, jisse pattiyan safed aur chandi jaisi (Silvery streaks) chamakne lagti hain.",
+    "remedies": [
+      "Chemical: Fipronil 5% SC ya Lambda-Cyhalothrin 5% EC ka spray karein.",
+      "Organic: Blue Sticky Traps pyaz ki crop me lagana boht asardari hai."
+    ]
+  },
+  "71": {
+    "pest_name": "Onion Maggot",
+    "crop": "Onion (Pyaz)",
+    "description": "Makkhi ka safed larva jo zameen ke andar pyaz ke kaand (bulb) me ghus jata hai aur use andar se sada deta hai, jisse poudha ukhad jata hai.",
+    "remedies": [
+      "Chemical: Chlorpyrifos 20% EC ko pani ke sath jado me dalein (Drenching).",
+      "Preventive: Fasal chakkar apnaein aur sadi hui pyaz ko khet me na chhodein."
+    ]
+  },
+  "72": {
+    "pest_name": "Garlic Maggot",
+    "crop": "Garlic (Lehsun)",
+    "description": "Is kide ka maggot lehsun ke naye kando aur jado ko andar se khata hai, jisse lehsun ki pattiya peeli padkar sookh jati hain.",
+    "remedies": [
+      "Chemical: Phorate 10G ya Carbofuran granules buwai ke samay mitti me dalein.",
+      "Organic: Neem cake powder (Neem ki khali) mitti me mix karein."
+    ]
+  },
+  "73": {
+    "pest_name": "Pepper Weevil",
+    "crop": "Pepper (Mirch)",
+    "description": "Chota beetle jo mirch ke phoolo aur naye phal (chilli pods) me ched karke ande deta hai, jisse mirch bina pakke hi niche gir jati hai.",
+    "remedies": [
+      "Chemical: Acetamiprid ya Spinosad ka spray flowering stage par karein.",
+      "Preventive: Giri hui mircho ko khet se roz chun kar naste karein taaki larvae aage na badhein."
+    ]
+  },
+  "74": {
+    "pest_name": "Pepper Maggot",
+    "crop": "Pepper (Mirch)",
+    "description": "Makkhi ka larva jo shimla mirch ya hari mirch ke andar rehkar uske beej aur deewar ko khata hai, jisse phal andar se kala padkar sad jata hai.",
+    "remedies": [
+      "Chemical: Dimethoate 30% EC ya Malathion ka chhidkav karein.",
+      "Preventive: Khet me badhti hui makkhiyo ko rokne ke liye sticky traps use karein."
+    ]
+  },
+  "75": {
+    "pest_name": "Eggplant Borer",
+    "crop": "Eggplant (Baingan)",
+    "description": "Baingan ka sabse bada dushman (Shoot and Fruit Borer). Yeh pehle baingan ke naye tano ko khata hai jisse wo jhuk jate hain, aur baad me baingan ke andar ghus kar use bilkul khane layak nahi chhodta.",
+    "remedies": [
+      "Chemical: Emamectin Benzoate 5% SG ya Chlorantraniliprole (Coragen) ka spray karein.",
+      "Organic: Leucinodes orbonalis pheromone traps (Baingan tech traps) 10 per acre lagayein."
+    ]
+  },
+  "76": {
+    "pest_name": "Eggplant Flea Beetle",
+    "crop": "Eggplant (Baingan)",
+    "description": "Chote kaale beetles jo baingan ki naye pattiyo ko khakar unme chhalni jaise sekdo holes kar dete hain, jisse poudha badh nahi pata.",
+    "remedies": [
+      "Chemical: Thiamethoxam 25% WG ya Cypermethrin spray karein.",
+      "Organic: Poudho par lakdi ki raakh (ash) ka dusting powder ki tarah chhidkav karein."
+    ]
+  },
+  "77": {
+    "pest_name": "Okra Shoot Borer",
+    "crop": "Okra (Bhindi)",
+    "description": "Yeh kida bhindi ke naye shubho (top shoots) ke andar ghus kar unhe khata hai, jisse bhindi ke poudhe ka upari part sookh kar mud jata hai.",
+    "remedies": [
+      "Chemical: Flubendiamide 480 SC ya Profenofos ka spray karein.",
+      "Organic: Affected shoots ko manually todkar mitti me daba dein."
+    ]
+  },
+  "78": {
+    "pest_name": "Okra Fruit Borer",
+    "crop": "Okra (Bhindi)",
+    "description": "Spotted Bollworm - Yeh larva bhindi ke phal (pod) me ched karke andar baithta hai, jisse bhindi tedhi-medhi ho jati hai aur market value zero ho jati hai.",
+    "remedies": [
+      "Chemical: Spinosad 45% SC ya Indoxacarb 14.5% SC ka spray karein.",
+      "Organic: Neem seed extract 5% ka chhidkav fali bante waqt karein."
+    ]
+  },
+  "79": {
+    "pest_name": "Okra Jassid",
+    "crop": "Okra (Bhindi)",
+    "description": "Hare rang ka chota kida jo bhindi ki pattiyo se side-ways chal kar ras choosta hai, jisse pattiyan peeli padkar cup ki tarah upar mud jati hain (Hopper Burn).",
+    "remedies": [
+      "Chemical: Imidacloprid 17.8% SL ya Thiamethoxam ka spray karein.",
+      "Organic: Yellow sticky cards poudho ki height par set karein."
+    ]
+  },
+  "80": {
+    "pest_name": "Mango Hopper",
+    "crop": "Mango (Aam)",
+    "description": "Aam ka sabse khatarnak kida (Andha kida). Yeh aam ke boor (flowers) aur naye phalo ka saara ras choos leta hai, jisse boor kala padkar gir jata hai aur aam nahi bante.",
+    "remedies": [
+      "Chemical: Imidacloprid 17.8% SL ya Thiamethoxam 25% WG ka spray boor aane se pehle aur naye phal bante waqt karein.",
+      "Organic: Neem based spray (3000 PPM) ka use karein aur tano par sticky bands lagayein."
+    ]
+  },
+  "81": {
+    "pest_name": "Mango Mealybug",
+    "crop": "Mango (Aam)",
+    "description": "Safed powder jaise layer se dhaka kida jo zameen se nikal kar aam ke ped par chadhta hai aur tano aur guchho se juice choosta hai, jisse ped kamzor ho jata hai.",
+    "remedies": [
+      "Chemical: Profenofos 50% EC ya Chlorpyrifos ka chhidkav karein.",
+      "Preventive: November-December me ped ke tane par zameen se 2 feet upar Alkathene band (plastic sheet) lapet dein taaki kide upar na chadh sakein."
+    ]
+  },
+  "82": {
+    "pest_name": "Mango Fruit Fly",
+    "crop": "Mango (Aam)",
+    "description": "Aam ki makkhi jo pakte hue aam ke andar ande deti hai. Iska larva (maggot) aam ke gude (pulp) ko andar se khata hai, jisse aam sadi hui smell ke sath gir jata hai.",
+    "remedies": [
+      "Chemical: Malathion 50% EC ka use bait spray ke sath karein.",
+      "Organic: Pedo par Methyl Eugenol Pheromone Traps (Fruit Fly Traps) 4-5 per acre lagayein."
+    ]
+  },
+  "83": {
+    "pest_name": "Mango Stem Borer",
+    "crop": "Mango (Aam)",
+    "description": "Bade size ka beetle jiska larva aam ke mote tano aur tehniyo ke andar ghus kar moti surang banata hai, jisse poori moti tehni sookh kar toot jati hai.",
+    "remedies": [
+      "Chemical: Tane ke ched (hole) me Kerosene ya Dichlorvos solution dalkar mitti ya rui se ched ko poori tarah band (plug) kar dein.",
+      "Preventive: Ped ki sookhi aur infested tehniyo ko kaat kar jala dein."
+    ]
+  },
+  "84": {
+    "pest_name": "Citrus Psylla",
+    "crop": "Citrus (Nimbu/Santra/Mousambi)",
+    "description": "Chote kide jo nimbu-vargiye phalo ki naye pattiyo ka juice chooste hain aur Citrus Greening (khatarnak bimari) failate hain, jisse ped ka sookhna chalu ho jata hai.",
+    "remedies": [
+      "Chemical: Dimethoate 30% EC ya Imidacloprid ka naye shubho par spray karein.",
+      "Organic: Neem oil spray karein aur bageeche me sahi ventilation banaye rakhein."
+    ]
+  },
+  "85": {
+    "pest_name": "Citrus Leafminer",
+    "crop": "Citrus (Nimbu/Santra/Mousambi)",
+    "description": "Is kide ka chota larva nimbu ki naye pattiyo ke andar tedi-medi safed chamakdar lakerien (surang) banata hai, jisse pattiya sikud kar badsurat ho jati hain.",
+    "remedies": [
+      "Chemical: Abamectin 1.9% EC ya Thiamethoxam ka chhidkav naye patte aate hi karein.",
+      "Organic: Neem Seed Kernel Extract (NSKE) 5% ka regular spray karein."
+    ]
+  },
+  "86": {
+    "pest_name": "Citrus Aphid",
+    "crop": "Citrus (Nimbu/Santra)",
+    "description": "Kaale aur hare rang ke chote kide jo nimbu ke naye phoolo aur tano par chipak kar juice chooste hain, jisse naye phal set nahi ho paate.",
+    "remedies": [
+      "Chemical: Acetamiprid 20% SP ya Thiacloprid ka spray karein.",
+      "Organic: Khet me ladybug beetles aur syrphid flies ko chemical free rakh kar badhava dein."
+    ]
+  },
+  "87": {
+    "pest_name": "Citrus Whitefly",
+    "crop": "Citrus (Nimbu/Santra)",
+    "description": "Safed choti makkhi jo pattiyo ke piche rehkar ras choosti hai aur honey-dew chhodti hai, jisse poora nimbu ka ped kala (Sooty mold) pad jata hai.",
+    "remedies": [
+      "Chemical: Pyriproxyfen 10% EC ya Spiromesifen 22.9% SC spray karein.",
+      "Organic: Yellow sticky traps bageeche me pedo ke beech me hang karein."
+    ]
+  },
+  "88": {
+    "pest_name": "Citrus Scale",
+    "crop": "Citrus (Nimbu/Santra)",
+    "description": "Chote badami-kaale rang ke chipke hue scale kide jo tehniyo aur phalo par jam jate hain aur ped ka juice choos kar ped ko bejan kar dete hain.",
+    "remedies": [
+      "Chemical: Buprofezin 25% SC ya Horticultural spray oil ka chhidkav karein.",
+      "Preventive: Infected tehniyo ko pruning ke waqt kaat kar saaf karein."
+    ]
+  },
+  "89": {
+    "pest_name": "Apple Aphid",
+    "crop": "Apple (Seb)",
+    "description": "Woolly Apple Aphid - Seb ke tano aur jado par safed rui (cotton) jaisi layer banakar chipkne wala kida, jo jado me gaantho (galls) bana deta hai.",
+    "remedies": [
+      "Chemical: Thiamethoxam 25% WG ya Chlorpyrifos ka spray ped aur jado ke paas karein.",
+      "Preventive: Resistant rootstocks (jaise MM111) ka use naye bageeche me karein."
+    ]
+  },
+  "90": {
+    "pest_name": "Apple Maggot",
+    "crop": "Apple (Seb)",
+    "description": "Makkhi ka larva jo seb ke andar tedi-medi lakerien banakar guda khata hai, jisse seb andar me bura aur sda hua ho jata hai.",
+    "remedies": [
+      "Chemical: Spinosad 45% SC ya Lambda-Cyhalothrin ka spray fruit development stage par karein.",
+      "Organic: Red sticky ball traps pedo par lagayein makkhiyo ko fasaane ke liye."
+    ]
+  },
+  "91": {
+    "pest_name": "Apple Codling Moth",
+    "crop": "Apple (Seb)",
+    "description": "Seb ka sabse bura kida. Iska larva seb ke bilkul center (core) me ghus jata hai aur beejon ko khata hai, jisse seb market me bechne layak nahi bachta.",
+    "remedies": [
+      "Chemical: Flubendiamide ya Chlorantraniliprole ka spray petal fall (phool girne ke baad) stage par karein.",
+      "Organic: Codling moth pheromone traps bageeche me lagayein."
+    ]
+  },
+  "92": {
+    "pest_name": "Apple Leafminer",
+    "crop": "Apple (Seb)",
+    "description": "Seb ki pattiyo ke andar ghus kar blotch (dhabbe) jaisi surang banane wala larva, jisse pattiya samay se pehle hi gir jati hain.",
+    "remedies": [
+      "Chemical: Indoxacarb 14.5% SC ya Profenofos ka spray karein.",
+      "Preventive: Patjhad (autumn) me bageeche ki saari giri hui pattiyo ko ikathha karke jala dein."
+    ]
+  },
+  "93": {
+    "pest_name": "Peach Borer",
+    "crop": "Peach/Plum (Aadoo/Aloo-bukhara)",
+    "description": "Yeh kida aadoo ke ped ke tane ke bilkul neeche mitti ke paas ched karke ghusta hai, jahan se gaadha goond (gum) nikalne lagta hai.",
+    "remedies": [
+      "Chemical: Carbaryl powder ya Chlorpyrifos ka ped ke nichle tane par heavy wash spray karein.",
+      "Preventive: Ped ke base par kisi bhi tarah ke mechanical damage se bachein."
+    ]
+  },
+  "94": {
+    "pest_name": "Peach Aphid",
+    "crop": "Peach (Aadoo)",
+    "description": "Green Peach Aphid - Yeh kida naye patte aate hi unka juice choosta hai, jisse aadoo ki pattiya poori tarah mud (curl) jati hain aur growth rukti hai.",
+    "remedies": [
+      "Chemical: Flonicamid 50% WG ya Imidacloprid ka chhidkav karein.",
+      "Organic: Neem formulations ya potassium soap salt ka spray karein."
+    ]
+  },
+  "95": {
+    "pest_name": "Peach Fruit Fly",
+    "crop": "Peach (Aadoo)",
+    "description": "Fruit fly jo aadoo ke phal me puncture karke ande deti hai, jisse aadoo pakne se pehle hi pichpicha hokar sada hua gir jata hai.",
+    "remedies": [
+      "Chemical: Malathion bait spray ka use karein.",
+      "Organic: Methyl Eugenol traps ko pedo par latkayein."
+    ]
+  },
+  "96": {
+    "pest_name": "Grape Berry Moth",
+    "crop": "Grape (Angoor)",
+    "description": "Angoor ke guchho (bunches) ka kida. Iska larva angoor ke naye daano me ched karta hai aur unpar ek jaala bana deta hai, jisse angoor sadne lagte hain.",
+    "remedies": [
+      "Chemical: Spinosad 45% SC ya Emamectin Benzoate ka spray pre-bloom aur post-bloom stage par karein.",
+      "Organic: Affected guchho ko manually saaf karein aur jaale ko hataein."
+    ]
+  },
+  "97": {
+    "pest_name": "Grape Leafhopper",
+    "crop": "Grape (Angoor)",
+    "description": "Chote tezi se chalne wale kide jo angoor ki pattiyo ke piche se juice chooste hain, jisse pattiyan peeli padkar jal jati hain aur angoor me chini kam banti hai.",
+    "remedies": [
+      "Chemical: Acetamiprid 20% SP ya Dinotefuran ka spray karein.",
+      "Organic: Neem oil 1500 PPM ka heavy spray karein."
+    ]
+  },
+  "98": {
+    "pest_name": "Grape Phylloxera",
+    "crop": "Grape (Angoor)",
+    "description": "Angoor ka ek boht hi micro kida jo angoor ki jado (roots) par attack karta hai, jisse jado me sadan paida hoti hai aur poora angoor ka bageecha dheere-dheere mar jata hai.",
+    "remedies": [
+      "Chemical: Spirotetramat (Movento) ka systemic spray use karein.",
+      "Preventive: Hamesha phylloxera-resistant rootstocks ka use karke hi naye angoor lagayein."
+    ]
+  },
+  "99": {
+    "pest_name": "Grape Mealybug",
+    "crop": "Grape (Angoor)",
+    "description": "Safed chipchipa kida jo angoor ke guchho ke andar, daano ke beech me chhup kar baithta hai aur juice choos kar poore guchhe ko kharab kar deta hai.",
+    "remedies": [
+      "Chemical: Buprofezin 25% SC ya Imidacloprid ka heavy targeted spray guchho par karein.",
+      "Organic: Cryptolaemus montrouzieri beetles (faydemand kide) bageeche me chodein jo mealybugs ko khati hain."
+    ]
+  },
+  "100": {
+    "pest_name": "Strawberry Aphid",
+    "crop": "Strawberry",
+    "description": "Strawberry ki naye pattiyo aur phoolo par aane wale chote kide jo Strawberry Mild Yellow Edge Virus failate hain, jisse phal ka size chota ho jata hai.",
+    "remedies": [
+      "Chemical: Thiamethoxam 25% WG ya Acetamiprid ka use karein.",
+      "Organic: Insecticidal soap spray ya organic pyrethrin ka use karein."
+    ]
+  },
+  "101": {
+    "pest_name": "Strawberry Mite",
+    "crop": "Strawberry",
+    "description": "Two-Spotted Spider Mite - Boht hi chote spider jaise kide jo strawberry ki pattiyo par barik jaale banate hain aur juice choos kar pattiyo ko badami aur sookha bana dete hain.",
+    "remedies": [
+      "Chemical: Abamectin 1.9% EC ya Fenpyroximate 5% EC (Miticides) ka spray karein.",
+      "Organic: Phytoseiulus persimilis (predatory mites) bageeche me chodein jo in spider mites ko natural tarike se khtm karti hain."
+    ]
+  }
+}

@@ -84,7 +84,7 @@ userSchema.methods.generateAccessToken = function () {
     },
     process.env.ACCESS_TOKEN_SECRET, //this is secret key
     {
-      expiresIn: process.env.ACCESS_TOKEN_EXPIRY, //this is expiry time
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRY || "15m", //this is expiry time
     }
   );
 };
@@ -96,7 +96,7 @@ userSchema.methods.generateRefreshToken = function () {
     },
     process.env.REFRESH_TOKEN_SECRET,
     {
-      expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
+      expiresIn: process.env.REFRESH_TOKEN_EXPIRY || "7d",
     }
   );
 };

@@ -16,8 +16,18 @@ Interactions:
     - Log level can be adjusted globally without touching individual files.
 """
 
+import io
 import logging
 import sys
+
+_stream = None
+
+
+def _get_stream():
+    global _stream
+    if _stream is None:
+        _stream = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace", line_buffering=True)
+    return _stream
 
 
 def get_logger(name: str) -> logging.Logger:
@@ -37,9 +47,7 @@ def get_logger(name: str) -> logging.Logger:
         logger.setLevel(logging.DEBUG)
 
         # Console handler — outputs to stdout with UTF-8 encoding (Windows fix)
-        import io
-        utf8_stream = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
-        handler = logging.StreamHandler(utf8_stream)
+        handler = logging.StreamHandler(_get_stream())
         handler.setLevel(logging.DEBUG)
 
         # Format: timestamp | level | module | message

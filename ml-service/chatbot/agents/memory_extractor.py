@@ -24,6 +24,9 @@ Examples of things to IGNORE:
 If the message contains an important fact, extract it as a concise statement (e.g., "User grows wheat on 5 acres in Punjab").
 If the message DOES NOT contain any new important fact, return EXACTLY the string: "NO_FACT". Do not return anything else.
 
+Facts ALREADY known about this user (do NOT repeat or reword these; if the message adds nothing beyond them, return "NO_FACT"):
+{known_facts}
+
 User Message:
 {message}
 """
@@ -33,12 +36,16 @@ def get_llm() -> Runnable:
     # Prefer GROQ if available for speed, otherwise fallback to Gemini
     if settings.GROQ_API_KEY:
         from langchain_groq import ChatGroq
-        return ChatGroq(api_key=settings.GROQ_API_KEY, model="llama3-70b-8192", temperature=0)
+        return ChatGroq(api_key=settings.GROQ_API_KEY, model=settings.GROQ_MODEL, temperature=0)
     else:
         from langchain_google_genai import ChatGoogleGenerativeAI
-        return ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=0)
+        return ChatGoogleGenerativeAI(
+            model=settings.LLM_MODEL,
+            google_api_key=settings.GOOGLE_API_KEY,
+            temperature=0,
+        )
 
-async def extract_memory_from_message(message: str) -> str | None:
+async def extract_memory_from_message(message: str, known_facts: list[str] | None = None) -> str | None:
     """
     Extracts permanent facts from a user message.
     Returns the fact string, or None if no fact was found.
@@ -48,7 +55,10 @@ async def extract_memory_from_message(message: str) -> str | None:
         prompt = PromptTemplate.from_template(MEMORY_EXTRACTION_PROMPT)
         chain = prompt | llm | StrOutputParser()
         
-        result = await chain.ainvoke({"message": message})
+        result = await chain.ainvoke({
+            "message": message,
+            "known_facts": "\n".join(f"- {f}" for f in known_facts) if known_facts else "(none)",
+        })
         
         result = result.strip()
         if "NO_FACT" in result or not result:

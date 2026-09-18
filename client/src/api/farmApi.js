@@ -158,3 +158,53 @@ export const changeProfileImageAPI = async (file) => {
     throw error;
   }
 };
+
+// ---- Disease / pest detection (ML-backed) ----
+export const scanCropImagesAPI = async (formData) => {
+  const response = await apiClient.post("/detections/scan", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data"
+    }
+  });
+  return response.data;
+};
+
+//🟢 detect pest api
+export const scanPestImagesAPI = async (formData) => {
+  const response = await apiClient.post("/detections/scan-pest", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data"
+    }
+  });
+  return response.data;
+};
+
+//🟢 get detectionHistory
+export const getDetectionHistoryAPI = async () => {
+  try {
+    const response = await apiClient.get('/detections/history');
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch detection history:', error);
+    throw error;
+  }
+};
+
+//🟢 get pestHistory
+export const getPestHistoryAPI = async () => {
+  try {
+    const response = await apiClient.get('/detections/history/pest');
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch pest history:', error);
+    throw error;
+  }
+};
+
+//🟢 delete detection record
+export const deleteDetectionAPI = async (id) => {
+    const response = await apiClient.delete(`/detections/records/${id}`);
+    return response.data;
+};
+
+//🟢 get current user api

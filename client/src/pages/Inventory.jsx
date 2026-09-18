@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { addItemAPI, getItemsAPI, deleteItemAPI } from '../api/inventoryApi';
 
@@ -22,7 +22,19 @@ const Inventory = () => {
   };
 
   useEffect(() => {
-    if (user) fetchItems();
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const data = await getItemsAPI();
+        if (!cancelled) setItems(data.items || []);
+      } catch (error) {
+        console.error("Error fetching inventory", error);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
   }, [user]);
 
   const handleSubmit = async (e) => {
@@ -33,7 +45,7 @@ const Inventory = () => {
       await addItemAPI(form);
       setForm({ itemName: '', category: 'seed', quantity: '', unit: 'kg', price: '' });
       fetchItems();
-    } catch (error) {
+    } catch {
       alert("Failed to add item");
     } finally {
       setAdding(false);

@@ -19,7 +19,7 @@ Interactions:
     - Called by: chatbot/retrievers/knowledge.py (similarity search)
 """
 
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
+from langchain_community.embeddings.fastembed import FastEmbedEmbeddings
 from langchain_mongodb import MongoDBAtlasVectorSearch
 from pymongo import MongoClient
 from pymongo.collection import Collection
@@ -41,10 +41,7 @@ class MongoVectorStore:
         self._collection: Collection = self._db[settings.KNOWLEDGE_COLLECTION]
         self._index_name = settings.KNOWLEDGE_INDEX_NAME
 
-        self._embeddings = GoogleGenerativeAIEmbeddings(
-            model=settings.EMBEDDING_MODEL,
-            google_api_key=settings.GOOGLE_API_KEY,
-        )
+        self._embeddings = FastEmbedEmbeddings(model_name=settings.FASTEMBED_MODEL)
 
         self._vector_store = MongoDBAtlasVectorSearch(
             collection=self._collection,
@@ -87,7 +84,7 @@ class MongoVectorStore:
         Args:
             query:      The search query text.
             k:          Number of results to return.
-            pre_filter: Optional MongoDB filter (e.g., {"metadata.category": "pest"}).
+            pre_filter: Optional MongoDB filter (e.g., {"category": "pest"}).
 
         Returns:
             List of {"content": str, "metadata": dict, "score": float} dicts.

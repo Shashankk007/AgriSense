@@ -1,0 +1,804 @@
+{
+  "Rice_healthy": {
+    "crop": "Rice",
+    "disease": "Healthy",
+    "severity": "None",
+    "affected_part": "Leaf",
+    "disease_type": "None",
+    "cause": "No disease detected",
+    "solution": "No treatment required",
+    "organic_solution": "Maintain proper irrigation and soil health",
+    "prevention": "Regular field monitoring and balanced fertilization",
+    "recommended_products": [],
+    "next_inspection_days": 15,
+    "yield_loss": "0%"
+  },
+  "Rice_leaf_blast": {
+    "crop": "Rice",
+    "disease": "Leaf Blast",
+    "severity": "High",
+    "affected_part": "Leaf",
+    "disease_type": "Fungal",
+    "cause": "Magnaporthe oryzae fungal infection",
+    "solution": "Apply Tricyclazole or Isoprothiolane fungicide",
+    "organic_solution": "Neem oil spray and Trichoderma biofungicides",
+    "prevention": "Avoid excess nitrogen and maintain field sanitation",
+    "recommended_products": [
+      "Tricyclazole 75% WP",
+      "Isoprothiolane",
+      "Trichoderma Biofungicide"
+    ],
+    "next_inspection_days": 5,
+    "yield_loss": "10-50%"
+  },
+  "Rice_brown_spot": {
+    "crop": "Rice",
+    "disease": "Brown Spot",
+    "severity": "Medium",
+    "affected_part": "Leaf",
+    "disease_type": "Fungal",
+    "cause": "Bipolaris oryzae fungal infection",
+    "solution": "Spray Mancozeb or Propiconazole",
+    "organic_solution": "Neem-based fungicides and compost tea",
+    "prevention": "Use disease-free seeds and balanced fertilization",
+    "recommended_products": [
+      "Mancozeb 75% WP",
+      "Propiconazole 25% EC"
+    ],
+    "next_inspection_days": 7,
+    "yield_loss": "10-40%"
+  },
+  "Rice_leaf_scald": {
+    "crop": "Rice",
+    "disease": "Leaf Scald",
+    "severity": "Medium",
+    "affected_part": "Leaf",
+    "disease_type": "Fungal",
+    "cause": "Microdochium oryzae fungal infection",
+    "solution": "Apply Carbendazim or Propiconazole",
+    "organic_solution": "Neem oil spray and improved drainage",
+    "prevention": "Avoid dense planting and excessive moisture",
+    "recommended_products": [
+      "Carbendazim 50% WP",
+      "Propiconazole 25% EC"
+    ],
+    "next_inspection_days": 7,
+    "yield_loss": "5-30%"
+  },
+  "Rice_bacterial_leaf_blight": {
+    "crop": "Rice",
+    "disease": "Bacterial Leaf Blight",
+    "severity": "High",
+    "affected_part": "Leaf",
+    "disease_type": "Bacterial",
+    "cause": "Xanthomonas oryzae bacterial infection",
+    "solution": "Apply Copper Oxychloride and Streptocycline",
+    "organic_solution": "Pseudomonas fluorescens formulations",
+    "prevention": "Use resistant varieties and avoid excess nitrogen",
+    "recommended_products": [
+      "Copper Oxychloride",
+      "Streptocycline",
+      "Pseudomonas fluorescens"
+    ],
+    "next_inspection_days": 4,
+    "yield_loss": "20-70%"
+  },
+  "Rice_narrow_brown_spot": {
+    "crop": "Rice",
+    "disease": "Narrow Brown Spot",
+    "severity": "Medium",
+    "affected_part": "Leaf",
+    "disease_type": "Fungal",
+    "cause": "Cercospora janseana fungal infection",
+    "solution": "Apply Mancozeb or Propiconazole",
+    "organic_solution": "Neem oil spray",
+    "prevention": "Balanced fertilization and field hygiene",
+    "recommended_products": [
+      "Mancozeb 75% WP",
+      "Propiconazole 25% EC"
+    ],
+    "next_inspection_days": 7,
+    "yield_loss": "5-20%"
+  },
+  "Sugarcane_Healthy": {
+    "crop": "Sugarcane",
+    "disease": "Healthy",
+    "severity": "None",
+    "affected_part": "Leaf",
+    "disease_type": "None",
+    "cause": "No disease detected",
+    "solution": "No treatment required",
+    "organic_solution": "Maintain soil fertility with organic manure",
+    "prevention": "Regular monitoring",
+    "recommended_products": [],
+    "next_inspection_days": 15,
+    "yield_loss": "0%"
+  },
+  "Sugarcane_RedRot": {
+    "crop": "Sugarcane",
+    "disease": "Red Rot",
+    "severity": "High",
+    "affected_part": "Stem",
+    "disease_type": "Fungal",
+    "cause": "Colletotrichum falcatum fungal infection",
+    "solution": "Remove infected canes and treat with Carbendazim",
+    "organic_solution": "Trichoderma biofungicides",
+    "prevention": "Use resistant varieties and healthy seed cane",
+    "recommended_products": [
+      "Carbendazim",
+      "Trichoderma Viride"
+    ],
+    "next_inspection_days": 3,
+    "yield_loss": "30-80%"
+  },
+  "Sugarcane_Rust": {
+    "crop": "Sugarcane",
+    "disease": "Rust",
+    "severity": "Medium",
+    "affected_part": "Leaf",
+    "disease_type": "Fungal",
+    "cause": "Puccinia species fungal infection",
+    "solution": "Spray Propiconazole or Mancozeb",
+    "organic_solution": "Neem oil and sulfur-based fungicides",
+    "prevention": "Maintain proper spacing and remove infected leaves",
+    "recommended_products": [
+      "Propiconazole",
+      "Mancozeb"
+    ],
+    "next_inspection_days": 7,
+    "yield_loss": "10-40%"
+  },
+  "Sugarcane_Yellow": {
+    "crop": "Sugarcane",
+    "disease": "Yellow Leaf Disease",
+    "severity": "High",
+    "affected_part": "Leaf",
+    "disease_type": "Viral",
+    "cause": "Sugarcane Yellow Leaf Virus",
+    "solution": "Remove infected plants and use certified seed cane",
+    "organic_solution": "Control aphids using neem extract",
+    "prevention": "Use resistant varieties and vector management",
+    "recommended_products": [
+      "Neem Oil",
+      "Yellow Sticky Traps"
+    ],
+    "next_inspection_days": 5,
+    "yield_loss": "10-50%"
+  },
+  "Sugarcane_Mosaic": {
+    "crop": "Sugarcane",
+    "disease": "Mosaic Disease",
+    "severity": "High",
+    "affected_part": "Leaf",
+    "disease_type": "Viral",
+    "cause": "Sugarcane Mosaic Virus",
+    "solution": "Remove infected plants and use virus-free planting material",
+    "organic_solution": "Neem-based aphid management",
+    "prevention": "Control aphids and use resistant varieties",
+    "recommended_products": [
+      "Neem Oil",
+      "Sticky Traps"
+    ],
+    "next_inspection_days": 5,
+    "yield_loss": "15-50%"
+  },
+  "Sugarcane_BacterialBlights": {
+    "crop": "Sugarcane",
+    "disease": "Bacterial Blight",
+    "severity": "High",
+    "affected_part": "Leaf",
+    "disease_type": "Bacterial",
+    "cause": "Xanthomonas species bacterial infection",
+    "solution": "Apply copper-based bactericides",
+    "organic_solution": "Pseudomonas fluorescens bio-control",
+    "prevention": "Avoid waterlogging and use healthy planting material",
+    "recommended_products": [
+      "Copper Oxychloride",
+      "Pseudomonas fluorescens"
+    ],
+    "next_inspection_days": 4,
+    "yield_loss": "10-40%"
+  },
+  "Tomato_healthy": {
+    "crop": "Tomato",
+    "disease": "Healthy",
+    "severity": "None",
+    "affected_part": "Leaf",
+    "disease_type": "None",
+    "cause": "No disease detected",
+    "solution": "No treatment required",
+    "organic_solution": "Maintain healthy irrigation and soil fertility",
+    "prevention": "Regular field monitoring",
+    "recommended_products": [],
+    "next_inspection_days": 15,
+    "yield_loss": "0%"
+  },
+  "Tomato_Bacterial_spot": {
+    "crop": "Tomato",
+    "disease": "Bacterial Spot",
+    "severity": "High",
+    "affected_part": "Leaf",
+    "disease_type": "Bacterial",
+    "cause": "Xanthomonas bacteria",
+    "solution": "Apply copper-based bactericides",
+    "organic_solution": "Pseudomonas fluorescens spray",
+    "prevention": "Avoid overhead irrigation and infected seeds",
+    "recommended_products": [
+      "Copper Oxychloride",
+      "Copper Hydroxide"
+    ],
+    "next_inspection_days": 4,
+    "yield_loss": "10-50%"
+  },
+  "Tomato_Early_blight": {
+    "crop": "Tomato",
+    "disease": "Early Blight",
+    "severity": "Medium",
+    "affected_part": "Leaf",
+    "disease_type": "Fungal",
+    "cause": "Alternaria solani fungus",
+    "solution": "Apply Mancozeb or Chlorothalonil",
+    "organic_solution": "Neem oil and Trichoderma",
+    "prevention": "Crop rotation and proper spacing",
+    "recommended_products": [
+      "Mancozeb",
+      "Chlorothalonil"
+    ],
+    "next_inspection_days": 7,
+    "yield_loss": "10-30%"
+  },
+  "Tomato_Late_blight": {
+    "crop": "Tomato",
+    "disease": "Late Blight",
+    "severity": "High",
+    "affected_part": "Leaf",
+    "disease_type": "Fungal",
+    "cause": "Phytophthora infestans",
+    "solution": "Apply Metalaxyl + Mancozeb",
+    "organic_solution": "Copper fungicides",
+    "prevention": "Avoid prolonged leaf wetness",
+    "recommended_products": [
+      "Ridomil Gold",
+      "Mancozeb"
+    ],
+    "next_inspection_days": 3,
+    "yield_loss": "30-80%"
+  },
+  "Tomato_Leaf_Mold": {
+    "crop": "Tomato",
+    "disease": "Leaf Mold",
+    "severity": "Medium",
+    "affected_part": "Leaf",
+    "disease_type": "Fungal",
+    "cause": "Passalora fulva fungus",
+    "solution": "Apply Chlorothalonil fungicide",
+    "organic_solution": "Neem oil spray",
+    "prevention": "Reduce greenhouse humidity",
+    "recommended_products": [
+      "Chlorothalonil"
+    ],
+    "next_inspection_days": 7,
+    "yield_loss": "10-40%"
+  },
+  "Tomato_Septoria_leaf_spot": {
+    "crop": "Tomato",
+    "disease": "Septoria Leaf Spot",
+    "severity": "Medium",
+    "affected_part": "Leaf",
+    "disease_type": "Fungal",
+    "cause": "Septoria lycopersici fungus",
+    "solution": "Apply Mancozeb",
+    "organic_solution": "Copper fungicide",
+    "prevention": "Remove infected leaves",
+    "recommended_products": [
+      "Mancozeb"
+    ],
+    "next_inspection_days": 5,
+    "yield_loss": "10-50%"
+  },
+  "Tomato_Spider_mites_Two_spotted_spider_mite": {
+    "crop": "Tomato",
+    "disease": "Two Spotted Spider Mite",
+    "severity": "Medium",
+    "affected_part": "Leaf",
+    "disease_type": "Pest",
+    "cause": "Tetranychus urticae infestation",
+    "solution": "Apply Abamectin",
+    "organic_solution": "Neem oil spray",
+    "prevention": "Maintain humidity and inspect leaves",
+    "recommended_products": [
+      "Abamectin",
+      "Neem Oil"
+    ],
+    "next_inspection_days": 3,
+    "yield_loss": "10-30%"
+  },
+  "Tomato_Target_Spot": {
+    "crop": "Tomato",
+    "disease": "Target Spot",
+    "severity": "Medium",
+    "affected_part": "Leaf",
+    "disease_type": "Fungal",
+    "cause": "Corynespora cassiicola fungus",
+    "solution": "Apply Azoxystrobin",
+    "organic_solution": "Copper fungicides",
+    "prevention": "Improve air circulation",
+    "recommended_products": [
+      "Azoxystrobin"
+    ],
+    "next_inspection_days": 5,
+    "yield_loss": "10-40%"
+  },
+  "Tomato_Tomato_Yellow_Leaf_Curl_Virus": {
+    "crop": "Tomato",
+    "disease": "Tomato Yellow Leaf Curl Virus",
+    "severity": "High",
+    "affected_part": "Leaf",
+    "disease_type": "Viral",
+    "cause": "Begomovirus transmitted by whiteflies",
+    "solution": "Remove infected plants and control whiteflies",
+    "organic_solution": "Neem oil and sticky traps",
+    "prevention": "Use resistant varieties",
+    "recommended_products": [
+      "Yellow Sticky Traps",
+      "Neem Oil"
+    ],
+    "next_inspection_days": 3,
+    "yield_loss": "30-100%"
+  },
+  "Tomato_Tomato_mosaic_virus": {
+    "crop": "Tomato",
+    "disease": "Tomato Mosaic Virus",
+    "severity": "High",
+    "affected_part": "Leaf",
+    "disease_type": "Viral",
+    "cause": "Tomato Mosaic Virus",
+    "solution": "Remove infected plants",
+    "organic_solution": "Disinfect tools and hands",
+    "prevention": "Use certified seeds",
+    "recommended_products": [],
+    "next_inspection_days": 3,
+    "yield_loss": "20-70%"
+  },
+  "Apple_healthy": {
+    "crop": "Apple",
+    "disease": "Healthy",
+    "severity": "None",
+    "affected_part": "Leaf",
+    "disease_type": "None",
+    "cause": "No disease detected",
+    "solution": "No treatment required",
+    "organic_solution": "Maintain proper orchard management",
+    "prevention": "Regular monitoring and pruning",
+    "recommended_products": [],
+    "next_inspection_days": 15,
+    "yield_loss": "0%"
+  },
+  "Apple_Apple_scab": {
+    "crop": "Apple",
+    "disease": "Apple Scab",
+    "severity": "High",
+    "affected_part": "Leaf and Fruit",
+    "disease_type": "Fungal",
+    "cause": "Venturia inaequalis fungus",
+    "solution": "Apply Captan or Mancozeb fungicide",
+    "organic_solution": "Sulfur-based fungicides",
+    "prevention": "Prune trees and remove fallen leaves",
+    "recommended_products": [
+      "Captan",
+      "Mancozeb",
+      "Wettable Sulfur"
+    ],
+    "next_inspection_days": 5,
+    "yield_loss": "20-70%"
+  },
+  "Apple_Black_rot": {
+    "crop": "Apple",
+    "disease": "Black Rot",
+    "severity": "High",
+    "affected_part": "Leaf, Fruit and Branch",
+    "disease_type": "Fungal",
+    "cause": "Botryosphaeria obtusa fungus",
+    "solution": "Remove infected fruits and apply fungicides",
+    "organic_solution": "Copper fungicide spray",
+    "prevention": "Maintain orchard sanitation",
+    "recommended_products": [
+      "Captan",
+      "Copper Oxychloride"
+    ],
+    "next_inspection_days": 5,
+    "yield_loss": "20-60%"
+  },
+  "Apple_Cedar_apple_rust": {
+    "crop": "Apple",
+    "disease": "Cedar Apple Rust",
+    "severity": "Medium",
+    "affected_part": "Leaf",
+    "disease_type": "Fungal",
+    "cause": "Gymnosporangium juniperi-virginianae fungus",
+    "solution": "Apply Myclobutanil fungicide",
+    "organic_solution": "Sulfur spray",
+    "prevention": "Remove nearby juniper hosts",
+    "recommended_products": [
+      "Myclobutanil",
+      "Sulfur"
+    ],
+    "next_inspection_days": 7,
+    "yield_loss": "10-30%"
+  },
+  "Blueberry_healthy": {
+    "crop": "Blueberry",
+    "disease": "Healthy",
+    "severity": "None",
+    "affected_part": "Leaf",
+    "disease_type": "None",
+    "cause": "No disease detected",
+    "solution": "No treatment required",
+    "organic_solution": "Maintain soil acidity and irrigation",
+    "prevention": "Regular monitoring",
+    "recommended_products": [],
+    "next_inspection_days": 15,
+    "yield_loss": "0%"
+  },
+  "Cherry_Powdery_mildew": {
+    "crop": "Cherry",
+    "disease": "Powdery Mildew",
+    "severity": "Medium",
+    "affected_part": "Leaf",
+    "disease_type": "Fungal",
+    "cause": "Podosphaera fungus",
+    "solution": "Apply sulfur or myclobutanil",
+    "organic_solution": "Neem oil spray",
+    "prevention": "Improve air circulation",
+    "recommended_products": [
+      "Sulfur",
+      "Myclobutanil",
+      "Neem Oil"
+    ],
+    "next_inspection_days": 7,
+    "yield_loss": "10-30%"
+  },
+  "Cherry_healthy": {
+    "crop": "Cherry",
+    "disease": "Healthy",
+    "severity": "None",
+    "affected_part": "Leaf",
+    "disease_type": "None",
+    "cause": "No disease detected",
+    "solution": "No treatment required",
+    "organic_solution": "Regular orchard care",
+    "prevention": "Routine monitoring",
+    "recommended_products": [],
+    "next_inspection_days": 15,
+    "yield_loss": "0%"
+  },
+  "Corn_Cercospora_leaf_spot_Gray_leaf_spot": {
+    "crop": "Corn",
+    "disease": "Gray Leaf Spot",
+    "severity": "High",
+    "affected_part": "Leaf",
+    "disease_type": "Fungal",
+    "cause": "Cercospora zeae-maydis fungus",
+    "solution": "Apply Azoxystrobin fungicide",
+    "organic_solution": "Copper fungicide",
+    "prevention": "Crop rotation",
+    "recommended_products": [
+      "Azoxystrobin",
+      "Copper Oxychloride"
+    ],
+    "next_inspection_days": 5,
+    "yield_loss": "20-50%"
+  },
+  "Corn_Common_rust": {
+    "crop": "Corn",
+    "disease": "Common Rust",
+    "severity": "Medium",
+    "affected_part": "Leaf",
+    "disease_type": "Fungal",
+    "cause": "Puccinia sorghi fungus",
+    "solution": "Apply fungicides when severe",
+    "organic_solution": "Neem oil spray",
+    "prevention": "Use resistant hybrids",
+    "recommended_products": [
+      "Propiconazole",
+      "Neem Oil"
+    ],
+    "next_inspection_days": 7,
+    "yield_loss": "10-30%"
+  },
+  "Corn_Northern_Leaf_Blight": {
+    "crop": "Corn",
+    "disease": "Northern Leaf Blight",
+    "severity": "High",
+    "affected_part": "Leaf",
+    "disease_type": "Fungal",
+    "cause": "Exserohilum turcicum fungus",
+    "solution": "Apply fungicides early",
+    "organic_solution": "Copper fungicide",
+    "prevention": "Use resistant varieties",
+    "recommended_products": [
+      "Azoxystrobin",
+      "Propiconazole"
+    ],
+    "next_inspection_days": 5,
+    "yield_loss": "15-50%"
+  },
+  "Corn_healthy": {
+    "crop": "Corn",
+    "disease": "Healthy",
+    "severity": "None",
+    "affected_part": "Leaf",
+    "disease_type": "None",
+    "cause": "No disease detected",
+    "solution": "No treatment required",
+    "organic_solution": "Maintain balanced nutrition",
+    "prevention": "Regular monitoring",
+    "recommended_products": [],
+    "next_inspection_days": 15,
+    "yield_loss": "0%"
+  },
+  "Grape_Black_rot": {
+    "crop": "Grape",
+    "disease": "Black Rot",
+    "severity": "High",
+    "affected_part": "Leaf and Fruit",
+    "disease_type": "Fungal",
+    "cause": "Guignardia bidwellii fungus",
+    "solution": "Apply Mancozeb or Myclobutanil",
+    "organic_solution": "Copper fungicide",
+    "prevention": "Remove infected berries",
+    "recommended_products": [
+      "Mancozeb",
+      "Myclobutanil"
+    ],
+    "next_inspection_days": 5,
+    "yield_loss": "20-80%"
+  },
+  "Grape_Esca_Black_Measles": {
+    "crop": "Grape",
+    "disease": "Esca (Black Measles)",
+    "severity": "High",
+    "affected_part": "Leaf and Vine",
+    "disease_type": "Fungal",
+    "cause": "Complex fungal infection",
+    "solution": "Prune infected vines",
+    "organic_solution": "Biological trunk treatments",
+    "prevention": "Avoid pruning wounds",
+    "recommended_products": [
+      "Trichoderma"
+    ],
+    "next_inspection_days": 5,
+    "yield_loss": "20-70%"
+  },
+  "Grape_Leaf_blight_Isariopsis_Leaf_Spot": {
+    "crop": "Grape",
+    "disease": "Leaf Blight",
+    "severity": "Medium",
+    "affected_part": "Leaf",
+    "disease_type": "Fungal",
+    "cause": "Pseudocercospora vitis",
+    "solution": "Apply fungicide",
+    "organic_solution": "Copper spray",
+    "prevention": "Improve canopy ventilation",
+    "recommended_products": [
+      "Mancozeb",
+      "Copper Oxychloride"
+    ],
+    "next_inspection_days": 7,
+    "yield_loss": "10-40%"
+  },
+  "Grape_healthy": {
+    "crop": "Grape",
+    "disease": "Healthy",
+    "severity": "None",
+    "affected_part": "Leaf",
+    "disease_type": "None",
+    "cause": "No disease detected",
+    "solution": "No treatment required",
+    "organic_solution": "Routine vineyard care",
+    "prevention": "Regular monitoring",
+    "recommended_products": [],
+    "next_inspection_days": 15,
+    "yield_loss": "0%"
+  },
+  "Orange_Haunglongbing_Citrus_greening": {
+    "crop": "Orange",
+    "disease": "Citrus Greening (HLB)",
+    "severity": "Very High",
+    "affected_part": "Leaf and Fruit",
+    "disease_type": "Bacterial",
+    "cause": "Candidatus Liberibacter bacteria",
+    "solution": "Remove infected trees and control psyllids",
+    "organic_solution": "Neem-based psyllid control",
+    "prevention": "Use certified disease-free plants",
+    "recommended_products": [
+      "Neem Oil",
+      "Sticky Traps"
+    ],
+    "next_inspection_days": 3,
+    "yield_loss": "30-100%"
+  },
+  "Peach_Bacterial_spot": {
+    "crop": "Peach",
+    "disease": "Bacterial Spot",
+    "severity": "High",
+    "affected_part": "Leaf and Fruit",
+    "disease_type": "Bacterial",
+    "cause": "Xanthomonas arboricola",
+    "solution": "Copper-based sprays",
+    "organic_solution": "Copper fungicides",
+    "prevention": "Avoid overhead irrigation",
+    "recommended_products": [
+      "Copper Oxychloride"
+    ],
+    "next_inspection_days": 5,
+    "yield_loss": "10-50%"
+  },
+  "Peach_healthy": {
+    "crop": "Peach",
+    "disease": "Healthy",
+    "severity": "None",
+    "affected_part": "Leaf",
+    "disease_type": "None",
+    "cause": "No disease detected",
+    "solution": "No treatment required",
+    "organic_solution": "Routine orchard care",
+    "prevention": "Regular monitoring",
+    "recommended_products": [],
+    "next_inspection_days": 15,
+    "yield_loss": "0%"
+  },
+  "Pepper_Bacterial_spot": {
+    "crop": "Bell Pepper",
+    "disease": "Bacterial Spot",
+    "severity": "High",
+    "affected_part": "Leaf and Fruit",
+    "disease_type": "Bacterial",
+    "cause": "Xanthomonas bacteria",
+    "solution": "Copper bactericides",
+    "organic_solution": "Pseudomonas fluorescens",
+    "prevention": "Use disease-free seeds",
+    "recommended_products": [
+      "Copper Oxychloride"
+    ],
+    "next_inspection_days": 5,
+    "yield_loss": "10-50%"
+  },
+  "Pepper_healthy": {
+    "crop": "Bell Pepper",
+    "disease": "Healthy",
+    "severity": "None",
+    "affected_part": "Leaf",
+    "disease_type": "None",
+    "cause": "No disease detected",
+    "solution": "No treatment required",
+    "organic_solution": "Maintain balanced fertilization",
+    "prevention": "Regular monitoring",
+    "recommended_products": [],
+    "next_inspection_days": 15,
+    "yield_loss": "0%"
+  },
+  "Potato_Early_blight": {
+    "crop": "Potato",
+    "disease": "Early Blight",
+    "severity": "Medium",
+    "affected_part": "Leaf",
+    "disease_type": "Fungal",
+    "cause": "Alternaria solani fungus",
+    "solution": "Apply Mancozeb",
+    "organic_solution": "Neem oil and compost tea",
+    "prevention": "Crop rotation",
+    "recommended_products": [
+      "Mancozeb"
+    ],
+    "next_inspection_days": 7,
+    "yield_loss": "10-40%"
+  },
+  "Potato_Late_blight": {
+    "crop": "Potato",
+    "disease": "Late Blight",
+    "severity": "High",
+    "affected_part": "Leaf and Tuber",
+    "disease_type": "Fungal",
+    "cause": "Phytophthora infestans",
+    "solution": "Apply Metalaxyl + Mancozeb",
+    "organic_solution": "Copper fungicide",
+    "prevention": "Avoid excess moisture",
+    "recommended_products": [
+      "Ridomil Gold",
+      "Mancozeb"
+    ],
+    "next_inspection_days": 3,
+    "yield_loss": "30-90%"
+  },
+  "Potato_healthy": {
+    "crop": "Potato",
+    "disease": "Healthy",
+    "severity": "None",
+    "affected_part": "Leaf",
+    "disease_type": "None",
+    "cause": "No disease detected",
+    "solution": "No treatment required",
+    "organic_solution": "Routine crop management",
+    "prevention": "Regular monitoring",
+    "recommended_products": [],
+    "next_inspection_days": 15,
+    "yield_loss": "0%"
+  },
+  "Raspberry_healthy": {
+    "crop": "Raspberry",
+    "disease": "Healthy",
+    "severity": "None",
+    "affected_part": "Leaf",
+    "disease_type": "None",
+    "cause": "No disease detected",
+    "solution": "No treatment required",
+    "organic_solution": "Routine care",
+    "prevention": "Regular monitoring",
+    "recommended_products": [],
+    "next_inspection_days": 15,
+    "yield_loss": "0%"
+  },
+  "Soybean_healthy": {
+    "crop": "Soybean",
+    "disease": "Healthy",
+    "severity": "None",
+    "affected_part": "Leaf",
+    "disease_type": "None",
+    "cause": "No disease detected",
+    "solution": "No treatment required",
+    "organic_solution": "Maintain balanced soil fertility",
+    "prevention": "Regular field inspection",
+    "recommended_products": [],
+    "next_inspection_days": 15,
+    "yield_loss": "0%"
+  },
+  "Squash_Powdery_mildew": {
+    "crop": "Squash",
+    "disease": "Powdery Mildew",
+    "severity": "Medium",
+    "affected_part": "Leaf",
+    "disease_type": "Fungal",
+    "cause": "Powdery mildew fungi",
+    "solution": "Apply sulfur fungicide",
+    "organic_solution": "Neem oil spray",
+    "prevention": "Improve air circulation",
+    "recommended_products": [
+      "Sulfur",
+      "Neem Oil"
+    ],
+    "next_inspection_days": 7,
+    "yield_loss": "10-40%"
+  },
+  "Strawberry_Leaf_scorch": {
+    "crop": "Strawberry",
+    "disease": "Leaf Scorch",
+    "severity": "Medium",
+    "affected_part": "Leaf",
+    "disease_type": "Fungal",
+    "cause": "Diplocarpon earlianum fungus",
+    "solution": "Apply fungicides",
+    "organic_solution": "Copper fungicides",
+    "prevention": "Avoid overhead watering",
+    "recommended_products": [
+      "Mancozeb",
+      "Copper Oxychloride"
+    ],
+    "next_inspection_days": 7,
+    "yield_loss": "10-30%"
+  },
+  "Strawberry_healthy": {
+    "crop": "Strawberry",
+    "disease": "Healthy",
+    "severity": "None",
+    "affected_part": "Leaf",
+    "disease_type": "None",
+    "cause": "No disease detected",
+    "solution": "No treatment required",
+    "organic_solution": "Routine care",
+    "prevention": "Regular monitoring",
+    "recommended_products": [],
+    "next_inspection_days": 15,
+    "yield_loss": "0%"
+  }
+}

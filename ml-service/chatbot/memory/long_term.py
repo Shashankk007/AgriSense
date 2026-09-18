@@ -32,9 +32,10 @@ Storage format per document:
     }
 """
 
+import asyncio
 from datetime import datetime, timezone
 
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
+from langchain_community.embeddings.fastembed import FastEmbedEmbeddings
 from pymongo import MongoClient
 
 from chatbot.config.settings import get_settings
@@ -52,10 +53,7 @@ class LongTermMemory:
         settings = get_settings()
         self._db = mongo_client[settings.DATABASE_NAME]
         self._collection = self._db[settings.MEMORY_COLLECTION]
-        self._embeddings = GoogleGenerativeAIEmbeddings(
-            model=settings.EMBEDDING_MODEL,
-            google_api_key=settings.GOOGLE_API_KEY,
-        )
+        self._embeddings = FastEmbedEmbeddings(model_name=settings.FASTEMBED_MODEL)
         logger.info(
             "LongTermMemory initialized | collection=%s",
             settings.MEMORY_COLLECTION,
@@ -71,8 +69,13 @@ class LongTermMemory:
         """
         logger.info("Storing memory for user=%s: %s", user_id, fact[:60])
 
+        # Skip exact duplicates (the extractor also avoids re-stating known facts)
+        if await asyncio.to_thread(self._collection.find_one, {"user_id": user_id, "fact": fact}):
+            logger.info("Fact already stored for user=%s, skipping", user_id)
+            return
+
         # Generate embedding for the fact
-        embedding = self._embeddings.embed_query(fact)
+        embedding = await asyncio.to_thread(self._embeddings.embed_query, fact)
 
         document = {
             "user_id": user_id,
@@ -81,7 +84,7 @@ class LongTermMemory:
             "created_at": datetime.now(timezone.utc),
         }
 
-        self._collection.insert_one(document)
+        await asyncio.to_thread(self._collection.insert_one, document)
         logger.info("Memory stored successfully for user=%s", user_id)
 
     def get_all_memories(self, user_id: str) -> list[dict]:
@@ -125,7 +128,7 @@ class LongTermMemory:
         logger.info("Retrieving relevant memories for user=%s | query=%s", user_id, query[:60])
 
         # Get query embedding
-        query_embedding = self._embeddings.embed_query(query)
+        query_embedding = await asyncio.to_thread(self._embeddings.embed_query, query)
 
         # For now, use MongoDB aggregation with $vectorSearch if index exists,
         # otherwise fall back to fetching all and computing similarity in Python.
@@ -150,7 +153,7 @@ class LongTermMemory:
                     }
                 },
             ]
-            results = list(self._collection.aggregate(pipeline))
+            results = await asyncio.to_thread(lambda: list(self._collection.aggregate(pipeline)))
             facts = [r["fact"] for r in results]
         except Exception as e:
             logger.warning(

@@ -6,7 +6,7 @@ import helmet from "helmet";
 
 import farmRoutes from "./routes/farmRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
-import detectionRoutes from "./routes/detectionRoutes.js";
+import detectionRoutes from "./routes/detection-routes.js";
 import cropRoutes from "./routes/cropRoutes.js";
 import inventoryRoutes from "./routes/inventoryRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
@@ -34,7 +34,7 @@ app.use(cookieParser());
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/farms", farmRoutes);
-app.use("/api/detection", detectionRoutes);
+app.use("/api/detections", detectionRoutes);
 app.use("/api/crops", cropRoutes);
 app.use("/api/inventory", inventoryRoutes);
 app.use("/api/analytics", analyticsRoutes);

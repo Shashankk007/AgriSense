@@ -1,9 +1,9 @@
-import React, { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { getFarmsAPI } from '../api/farmApi';
+import { getFarmsAPI, getDetectionHistoryAPI, getPestHistoryAPI } from '../api/farmApi';
 import { getItemsAPI } from '../api/inventoryApi';
-import apiClient from '../api/axiosConfig';
+import axios from 'axios';
 
 /* ─── tiny hook to get time-based greeting ─── */
 function useGreeting(name) {
@@ -96,8 +96,8 @@ const Dashboard = () => {
         const [farmRes, invRes, diseaseRes, pestRes] = await Promise.allSettled([
           getFarmsAPI(),
           getItemsAPI(),
-          apiClient.get(`/detection/user/${user.id}/disease`),
-          apiClient.get(`/detection/user/${user.id}/pest`),
+          getDetectionHistoryAPI(),
+          getPestHistoryAPI(),
         ]);
 
         const farmList = farmRes.status === 'fulfilled' ? (farmRes.value.farms ?? []) : [];
@@ -105,8 +105,8 @@ const Dashboard = () => {
         setStats({
           farms: farmList.length,
           items: invRes.status === 'fulfilled' ? (invRes.value.items?.length ?? 0) : 0,
-          diseaseScans: diseaseRes.status === 'fulfilled' ? (diseaseRes.value.data?.count ?? 0) : 0,
-          pestScans: pestRes.status === 'fulfilled' ? (pestRes.value.data?.count ?? 0) : 0,
+          diseaseScans: diseaseRes.status === 'fulfilled' ? (diseaseRes.value.history?.length ?? 0) : 0,
+          pestScans: pestRes.status === 'fulfilled' ? (pestRes.value.history?.length ?? 0) : 0,
         });
       } catch {
         /* silent */
@@ -116,6 +116,31 @@ const Dashboard = () => {
     };
     load();
   }, [user]);
+
+  // Current weather at the user's location (Open-Meteo, no API key)
+  const [weather, setWeather] = useState(null);
+  useEffect(() => {
+    if (!('geolocation' in navigator)) return;
+    navigator.geolocation.getCurrentPosition(
+      async ({ coords }) => {
+        try {
+          const { data } = await axios.get(
+            `https://api.open-meteo.com/v1/forecast?latitude=${coords.latitude}&longitude=${coords.longitude}&current_weather=true`
+          );
+          const c = data.current_weather;
+          const code = c.weathercode;
+          const [icon, label] =
+            code >= 95 ? ['⛈️', 'Thunderstorm'] :
+            code >= 71 && code <= 77 ? ['❄️', 'Snow'] :
+            code >= 51 && code <= 67 ? ['🌧️', 'Rain'] :
+            code >= 45 && code <= 48 ? ['🌫️', 'Foggy'] :
+            code >= 1 && code <= 3 ? ['⛅', 'Partly cloudy'] : ['☀️', 'Clear'];
+          setWeather({ icon, label, temp: `${c.temperature}°C` });
+        } catch { /* weather is optional */ }
+      },
+      () => { /* location denied: hide the weather chip */ }
+    );
+  }, []);
 
   const today = new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
@@ -133,6 +158,11 @@ const Dashboard = () => {
           <div className="flex items-center gap-2 mt-4">
             <span className="w-2 h-2 rounded-full bg-green-300 animate-pulse" />
             <span className="text-green-200 text-sm font-medium">AgriSense AI · Online</span>
+            {weather && (
+              <span className="ml-4 text-green-100 text-sm font-medium bg-white/10 px-3 py-1 rounded-full">
+                {weather.icon} {weather.temp} · {weather.label}
+              </span>
+            )}
           </div>
         </div>
         <div className="absolute -right-8 -top-8 text-[200px] opacity-5 select-none">🌾</div>
@@ -152,7 +182,7 @@ const Dashboard = () => {
         <h2 className="text-lg font-bold text-gray-700 mb-4">Quick Actions</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           <ActionCard
-            to="/workspace/crop-prediction"
+            to="/workspace/crop-health"
             gradient="bg-gradient-to-br from-green-500 to-emerald-700"
             emoji="🌱"
             title="Crop Analysis"
@@ -217,7 +247,7 @@ const Dashboard = () => {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-bold text-gray-800">Your Farm Boundaries</h2>
-            <Link to="/workspace/crop-prediction" className="text-sm font-semibold text-green-600 hover:text-green-700">
+            <Link to="/workspace/crop-health" className="text-sm font-semibold text-green-600 hover:text-green-700">
               Open Map →
             </Link>
           </div>

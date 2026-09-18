@@ -1,19 +1,21 @@
-import React, { useContext } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useContext } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Home from './pages/Home.jsx'
 import Layout from './pages/Layout.jsx'
 import Dashboard from './pages/Dashboard.jsx'
-import CropPrediction from './pages/CropPrediction.jsx'
 import DiseaseDetection from './pages/DiseaseDetection.jsx'
 import PestDetection from './pages/PestDetection.jsx'
 import Inventory from './pages/Inventory.jsx'
 import ForgotPassword from './pages/ForgotPassword.jsx';
 import ResetPassword from './pages/ResetPassword.jsx';
 import Auth from './pages/Auth.jsx' 
+import CropHealth from './pages/CropHealth.jsx'
 import Signup from './pages/SignUp.jsx';
 import Profile from './pages/Profile.jsx';
-import ChatWidget from './components/ChatWidget.jsx';
 import { AuthContext } from './context/AuthContext';
+import DetectionHistory from './pages/DetectionHistory.jsx';
+import { Toaster } from 'react-hot-toast'; 
+import ChatbotWidget from './components/ChatbotWidget';
 
 // ProtectedRoute component ensures that only authenticated users can access certain routes.
 const ProtectedRoute = ({ children }) => {
@@ -38,6 +40,7 @@ const ProtectedRoute = ({ children }) => {
 const App = () => {
   return (
     <div className="text-gray-800 font-sans selection:bg-green-200">
+      <Toaster position="top-right" reverseOrder={false} />
       <Routes>
         {/* Main Public Landing Page */}
         <Route path="/" element={<Home />} />
@@ -48,16 +51,15 @@ const App = () => {
         {/* Nested AI Tooling Workspace Routes */}
         <Route path="/workspace" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
           <Route index element={<Dashboard />} />
-          <Route path="crop-prediction" element={<CropPrediction />} />
           <Route path="disease-detection" element={<DiseaseDetection />} />
           <Route path="pest-detection" element={<PestDetection />} />
           <Route path="inventory" element={<Inventory />} />
+          <Route path="crop-health" element={<CropHealth />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="detection-history" element={<DetectionHistory />} />
         </Route>
       </Routes>
-
-      {/* Global floating AI chat widget — visible on all pages for logged-in users */}
-      <ChatWidget />
+      <ChatbotWidget />
     </div>
   )
 }

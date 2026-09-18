@@ -37,6 +37,12 @@ Contains the main request handlers where business logic lives.
   - Update profile image
   - Get current user data
 
+- `chat-controller.js`
+  - Forward chat, history and conversation requests to the ML service
+
+- `detection-controller.js`
+  - Upload photos to Cloudinary, call the ML service, and store disease/pest results
+
 - `farm-controller.js`
   - Create a farm boundary
   - Calculate farm area with Turf.js
@@ -58,12 +64,25 @@ Defines API endpoints and connects them to controllers and middleware.
   - `POST /api/farms/save-boundary`
   - `GET /api/farms`
   - `GET /api/farms/:id`
+  - `GET /api/farms/:id/ndvi` (ownership-checked proxy to the ML service)
   - `DELETE /api/farms/:id`
+
+- `detection-routes.js`
+  - `POST /api/detections/scan` (disease) and `/scan-pest`
+  - `GET /api/detections/history` and `/history/pest`
+  - `DELETE /api/detections/records/:id`
+
+- `chatRoutes.js` (authenticated proxy to the ML chatbot; `user_id` comes from the session)
+  - `POST /api/chat`
+  - `GET /api/chat/history`
+  - `GET /api/chat/conversations/:id`
+
+- `inventoryRoutes.js`, `cropRoutes.js`, `analyticsRoutes.js`
 
 ### `middlewares/`
 Reusable request middleware.
 
-- `isLoggerIn.js`
+- `isLoggedIn.js`
   - Protects routes that require authentication
   - Reads JWT from cookies or authorization headers
   - Attaches the authenticated user to `req.user`
@@ -113,14 +132,18 @@ Shared helper modules used across the backend.
 Typical variables used by this backend include:
 
 - `PORT`
-- `MONGO_URL`
+- `MONGODB_URI`
 - `CLIENT_URL`
 - `ACCESS_TOKEN_SECRET`
 - `ACCESS_TOKEN_EXPIRY`
 - `REFRESH_TOKEN_SECRET`
 - `REFRESH_TOKEN_EXPIRY`
 - `GOOGLE_CLIENT_ID`
-- Cloudinary-related credentials
+- `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`
+- `EMAIL_USER`, `EMAIL_PASS` (password-reset emails)
+- `FAST_API_URL`, `ML_ADMIN_KEY` (ML service address and shared secret; the key must match `ml-service/.env`)
+
+See [.env.example](.env.example) for the full list.
 
 ## Run the backend
 
@@ -134,6 +157,14 @@ For production:
 ```bash
 npm start
 ```
+
+## Test
+
+```bash
+npm test
+```
+
+Unit tests use Node's built-in test runner (`tests/`).
 
 ## Notes
 

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 
 const AiTools = () => {
@@ -12,12 +11,12 @@ const AiTools = () => {
       <div className="grid md:grid-cols-2 gap-12">
         <div className="bg-white p-10 rounded-3xl shadow-lg hover:shadow-2xl transition-all border border-gray-100">
           <div className="text-6xl mb-6">🌾</div>
-          <h4 className="text-2xl font-bold text-gray-800 mb-4">Crop Prediction</h4>
+          <h4 className="text-2xl font-bold text-gray-800 mb-4">Crop Health Map</h4>
           <p className="text-gray-600 leading-relaxed mb-8">
-            Enter your soil parameters (N, P, K, pH) and weather conditions, and let our AI recommend the most profitable crop for your land.
+            Draw your field on the map and get satellite NDVI analysis showing which parts of your crop are healthy, stressed or bare.
           </p>
-          <Link to="/workspace/crop-prediction" className="inline-flex items-center gap-2 bg-green-50 text-green-700 px-6 py-3 rounded-xl font-bold hover:bg-green-100 transition-colors">
-            Try Prediction <span>→</span>
+          <Link to="/workspace/crop-health" className="inline-flex items-center gap-2 bg-green-50 text-green-700 px-6 py-3 rounded-xl font-bold hover:bg-green-100 transition-colors">
+            Open Map <span>→</span>
           </Link>
         </div>
 

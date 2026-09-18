@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { sendChatMessageAPI, getChatHistoryAPI, getConversationAPI } from '../api/mlApi';
-import { X, Send, Loader2, Bot, Menu, Plus, Clock, MessageSquare } from 'lucide-react';
+import { X, Send, Loader2, Bot, Menu, Plus, MessageSquare } from 'lucide-react';
 
 const ChatbotWidgetInner = () => {
   const { user } = useContext(AuthContext);
@@ -42,18 +42,12 @@ const ChatbotWidgetInner = () => {
     }
   }, [isMenuOpen, user]);
 
-  // Initial greeting when opened
-  useEffect(() => {
-    if (isOpen && messages.length === 0) {
-      setMessages([
-        {
-          id: 'greeting',
-          sender: 'bot',
-          text: `Hello ${user?.name || 'Farmer'}! How can AgriSense help you today?`,
-        },
-      ]);
-    }
-  }, [isOpen, messages.length, user]);
+  // Show a greeting until the first message exists (derived, not stored)
+  const visibleMessages = messages.length > 0 ? messages : [{
+    id: 'greeting',
+    sender: 'bot',
+    text: `Hello ${user?.name || 'Farmer'}! How can AgriSense help you today?`,
+  }];
 
   // Do not render if the user is not authenticated (chat history is keyed by user id)
   if (!user || !user.id) {
@@ -117,7 +111,7 @@ const ChatbotWidgetInner = () => {
         text: data.response,
       };
       setMessages((prev) => [...prev, botMessage]);
-    } catch (error) {
+    } catch {
       const errorMessage = {
         id: (Date.now() + 1).toString(),
         sender: 'bot',
@@ -217,7 +211,7 @@ const ChatbotWidgetInner = () => {
 
           {/* Messages Area */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50/50">
-            {messages.map((msg) => (
+            {visibleMessages.map((msg) => (
               <div
                 key={msg.id}
                 className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}

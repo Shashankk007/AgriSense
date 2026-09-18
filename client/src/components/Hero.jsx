@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 
 const Hero = () => {
@@ -25,8 +24,8 @@ const Hero = () => {
         
         {/* Call to Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-          <Link to="/workspace/crop-prediction" className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-8 rounded-xl shadow-md transition-all hover:-translate-y-0.5">
-            Start predicting now
+          <Link to="/workspace/crop-health" className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-8 rounded-xl shadow-md transition-all hover:-translate-y-0.5">
+            Analyze my farm
           </Link>
           <button className="w-full sm:w-auto bg-white hover:bg-gray-50 text-gray-800 font-semibold py-3 px-8 rounded-xl shadow-sm border border-gray-200 transition-all hover:-translate-y-0.5">
             Watch demo

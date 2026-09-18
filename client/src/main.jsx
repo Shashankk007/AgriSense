@@ -1,8 +1,8 @@
-import { StrictMode } from 'react'
+
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom' 
 import { GoogleOAuthProvider } from '@react-oauth/google' 
-import { AuthProvider } from './context/AuthContext.jsx'
+import { AuthProvider } from './context/AuthProvider.jsx'
 
 // To ensure Leaflet works properly in Vite + React 18 environment, 
 // we need to expose the Leaflet library globally. 

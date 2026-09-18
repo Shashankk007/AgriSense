@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Polygon, useMap, LayersControl } from 'react-leaflet';
 import toast from 'react-hot-toast';
 import { getFarmsAPI, saveFarmBoundaryAPI } from '../api/farmApi';
@@ -116,10 +116,6 @@ const CropHealth = () => {
   const [healthData, setHealthData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    fetchFarms();
-  }, []);
-
   const fetchFarms = async () => {
     try {
       const res = await getFarmsAPI();
@@ -133,6 +129,23 @@ const CropHealth = () => {
       toast.error("Failed to load farms");
     }
   };
+
+  // Load farms on mount (cancel-safe; fetchFarms above is kept for manual refreshes)
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await getFarmsAPI();
+        if (cancelled) return;
+        if (res && res.farms) setFarms(res.farms);
+        else if (Array.isArray(res)) setFarms(res);
+      } catch (err) {
+        console.error(err);
+        if (!cancelled) toast.error("Failed to load farms");
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   const onFarmSelect = (farmId) => {
     const farm = farms.find(f => f._id === farmId);
@@ -237,7 +250,7 @@ const CropHealth = () => {
         }
         loadHealthData(res.farm._id);
       }
-    } catch (err) {
+    } catch {
       toast.error("Failed to save farm");
     } finally {
       setIsLoading(false);

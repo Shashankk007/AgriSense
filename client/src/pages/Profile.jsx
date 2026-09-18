@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import { useState, useEffect, useContext, useRef } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { updateProfileAPI, changePasswordAPI, changeProfileImageAPI } from '../api/farmApi';
 
@@ -43,6 +43,19 @@ function parsePhone(stored) {
   // No known prefix — treat entire string as number
   return { code: '+91', number: stored };
 }
+
+// Helper for message banners
+const MsgBanner = ({ msg }) => {
+  if (!msg) return null;
+  return (
+    <p className={`text-sm font-medium mt-3 px-3 py-2 rounded-lg ${
+      msg.type === 'success' ? 'bg-green-50 text-green-700 border border-green-100' : 'bg-red-50 text-red-600 border border-red-100'
+    }`}>
+      {msg.text}
+    </p>
+  );
+};
+
 
 const Profile = () => {
   const { user, setUser } = useContext(AuthContext);
@@ -218,18 +231,6 @@ const Profile = () => {
     } finally {
       setImgUploading(false);
     }
-  };
-
-  // Helper for message banners
-  const MsgBanner = ({ msg }) => {
-    if (!msg) return null;
-    return (
-      <p className={`text-sm font-medium mt-3 px-3 py-2 rounded-lg ${
-        msg.type === 'success' ? 'bg-green-50 text-green-700 border border-green-100' : 'bg-red-50 text-red-600 border border-red-100'
-      }`}>
-        {msg.text}
-      </p>
-    );
   };
 
   return (

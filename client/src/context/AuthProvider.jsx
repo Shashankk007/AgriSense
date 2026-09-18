@@ -1,7 +1,6 @@
-import React, { createContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { AuthContext } from './AuthContext.js';
 import { getCurrentUserAPI, logoutAPI } from '../api/farmApi';
-
-export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   // User data is stored strictly in React memory
@@ -25,7 +24,7 @@ export const AuthProvider = ({ children }) => {
             address: data.address || '',
           });
         }
-      } catch (error) {
+      } catch {
         if (isMounted) {
           setUser(null);
         }

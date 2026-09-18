@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { scanCropImagesAPI, getFarmsAPI, getDetectionHistoryAPI } from '../api/farmApi';
 import { useNavigate } from 'react-router-dom';
@@ -77,7 +77,7 @@ const DiseaseDetection = () => {
             setIsLocating(false);
             toast.success("📍 Location captured automatically!");
           },
-          (error) => {
+          () => {
             setIsLocating(false);
             toast.error("Location access denied. Using default map settings.");
           }

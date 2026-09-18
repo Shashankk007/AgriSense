@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { getDetectionHistoryAPI, getPestHistoryAPI, deleteDetectionAPI } from '../api/farmApi';
 import toast from 'react-hot-toast';
 
@@ -22,7 +22,7 @@ const DetectionHistory = () => {
         if (pestRes.success) {
           setPestHistory(pestRes.history);
         }
-      } catch (error) {
+      } catch {
         toast.error("Failed to load history.");
       } finally {
         setIsLoading(false);

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { getFarmsAPI, getDetectionHistoryAPI, getPestHistoryAPI } from '../api/farmApi';
@@ -182,7 +182,7 @@ const Dashboard = () => {
         <h2 className="text-lg font-bold text-gray-700 mb-4">Quick Actions</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           <ActionCard
-            to="/workspace/crop-prediction"
+            to="/workspace/crop-health"
             gradient="bg-gradient-to-br from-green-500 to-emerald-700"
             emoji="🌱"
             title="Crop Analysis"
@@ -247,7 +247,7 @@ const Dashboard = () => {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-bold text-gray-800">Your Farm Boundaries</h2>
-            <Link to="/workspace/crop-prediction" className="text-sm font-semibold text-green-600 hover:text-green-700">
+            <Link to="/workspace/crop-health" className="text-sm font-semibold text-green-600 hover:text-green-700">
               Open Map →
             </Link>
           </div>

@@ -1,9 +1,8 @@
-import React, { useContext } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useContext } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Home from './pages/Home.jsx'
 import Layout from './pages/Layout.jsx'
 import Dashboard from './pages/Dashboard.jsx'
-import CropPrediction from './pages/CropPrediction.jsx'
 import DiseaseDetection from './pages/DiseaseDetection.jsx'
 import PestDetection from './pages/PestDetection.jsx'
 import Inventory from './pages/Inventory.jsx'
@@ -52,7 +51,6 @@ const App = () => {
         {/* Nested AI Tooling Workspace Routes */}
         <Route path="/workspace" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
           <Route index element={<Dashboard />} />
-          <Route path="crop-prediction" element={<CropPrediction />} />
           <Route path="disease-detection" element={<DiseaseDetection />} />
           <Route path="pest-detection" element={<PestDetection />} />
           <Route path="inventory" element={<Inventory />} />

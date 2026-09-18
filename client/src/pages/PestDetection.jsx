@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { scanPestImagesAPI, getFarmsAPI, getPestHistoryAPI } from '../api/farmApi';
 import { useNavigate } from 'react-router-dom';
@@ -70,7 +70,7 @@ const PestDetection = () => {
             setIsLocating(false);
             toast.success("📍 Location captured automatically!");
           },
-          (error) => {
+          () => {
             setIsLocating(false);
             toast.error("Location access denied.");
           }

@@ -84,7 +84,7 @@ class MongoVectorStore:
         Args:
             query:      The search query text.
             k:          Number of results to return.
-            pre_filter: Optional MongoDB filter (e.g., {"metadata.category": "pest"}).
+            pre_filter: Optional MongoDB filter (e.g., {"category": "pest"}).
 
         Returns:
             List of {"content": str, "metadata": dict, "score": float} dicts.

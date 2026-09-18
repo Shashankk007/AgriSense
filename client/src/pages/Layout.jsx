@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import { useContext, useState } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext'; // 👈 Naya Import
 
@@ -50,16 +50,6 @@ const Layout = () => {
               }`}
           >
             <span className="text-xl">⌂</span> Dashboard
-          </Link>
-
-          <Link
-            to="/workspace/crop-prediction"
-            className={`flex items-center gap-3 p-3.5 rounded-xl font-semibold transition-all ${isActive('/workspace/crop-prediction')
-                ? 'bg-green-600 text-white shadow-md'
-                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-              }`}
-          >
-            <span className="text-xl">✨</span> Crop Prediction
           </Link>
 
           <Link

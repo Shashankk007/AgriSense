@@ -58,7 +58,7 @@ class KnowledgeRetriever:
         # Build pre-filter if category specified
         pre_filter = None
         if category:
-            pre_filter = {"metadata.category": category}
+            pre_filter = {"category": category}
 
         # Search the vector store
         results = self._vector_store.similarity_search(

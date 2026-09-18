@@ -1,6 +1,10 @@
-import requests
-import json
+import os
 import sys
+
+import requests
+from dotenv import load_dotenv
+
+load_dotenv()  # picks up ML_ADMIN_KEY from ml-service/.env
 
 # URL where your FastAPI server is running
 API_URL = "http://localhost:8000/chat"
@@ -31,7 +35,7 @@ def main():
             }
             
             # Send request to your FastAPI backend
-            response = requests.post(API_URL, json=payload)
+            response = requests.post(API_URL, json=payload, headers={"X-Admin-Key": os.environ.get("ML_ADMIN_KEY", "")})
             
             if response.status_code == 200:
                 data = response.json()

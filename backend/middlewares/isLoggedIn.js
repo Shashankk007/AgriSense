@@ -8,7 +8,6 @@ export const isLoggedIn = wrapAsync(async(req, _, next) => {
         const token = req.cookies?.accesstoken || 
         req.header("Authorization")?.replace("Bearer ", "")
         
-        // console.log(token);
         if (!token) {
             throw new apiError(401, "Unauthorized request")
         }
@@ -16,7 +15,6 @@ export const isLoggedIn = wrapAsync(async(req, _, next) => {
         const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
     
         const user = await User.findById(decodedToken.id).select("-password -refreshToken")
-        // console.log(user);
         
     
         if (!user) {

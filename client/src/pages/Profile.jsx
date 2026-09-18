@@ -154,7 +154,6 @@ const Profile = () => {
         phone: combinedPhone,
         address: formData.address.trim(),
       });
-      console.log('✅ Profile save result:', result);
       setUser((prev) => ({
         ...prev,
         name: result.user.username,

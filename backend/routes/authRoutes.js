@@ -15,7 +15,7 @@ import {
   forgotPassword,
   resetPassword,
 } from "../controllers/user-controller.js";
-import { isLoggedIn } from "../middlewares/isLoggerIn.js";
+import { isLoggedIn } from "../middlewares/isLoggedIn.js";
 import { upload } from "../middlewares/multer.js";
 import wrapAsync from "../utils/wrapAsync.js";
 import apiError from "../utils/apiError.js";

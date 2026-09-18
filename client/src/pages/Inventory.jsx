@@ -54,10 +54,8 @@ const Inventory = () => {
 
   const handleDelete = async (id) => {
     if (!id) return;
-    console.log("🗑️ Deleting item:", id);
     try {
-      const res = await deleteItemAPI(id);
-      console.log("✅ Delete response:", res);
+      await deleteItemAPI(id);
       setItems((prev) => prev.filter(i => i._id !== id));
     } catch (error) {
       console.error("❌ Failed to delete", error);

@@ -86,7 +86,6 @@ const registerUser = wrapAsync(async (req, res) => {
 
 const loginUser = wrapAsync(async (req, res) => {
     const { username, email, password } = req.body;
-    // console.log("req.body:", req.body);
     if (!(username || email)) {
         throw new apiError(400, "Username or Email is required")
     }

@@ -1,6 +1,6 @@
 import express from "express";
 import { addItem, getItems, updateItem, deleteItem } from "../controllers/inventory-controller.js";
-import { isLoggedIn } from "../middlewares/isLoggerIn.js";
+import { isLoggedIn } from "../middlewares/isLoggedIn.js";
 const router = express.Router();
 router.post("/", isLoggedIn, addItem);
 router.get("/", isLoggedIn, getItems);

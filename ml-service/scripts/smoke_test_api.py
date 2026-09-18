@@ -2,6 +2,9 @@ import json
 import os
 
 import requests
+from dotenv import load_dotenv
+
+load_dotenv()
 
 base_url = "http://localhost:8000"
 # Admin endpoints (/memory/*, /knowledge/upload) need ML_ADMIN_KEY from ml-service/.env
@@ -33,5 +36,5 @@ payload = {
     "user_id": "test_user_123",
     "message": "When should I harvest my crop? Also, what type of soil does it need?"
 }
-res = requests.post(f"{base_url}/chat", json=payload)
+res = requests.post(f"{base_url}/chat", json=payload, headers=admin)
 print(res.status_code, json.dumps(res.json(), indent=2))

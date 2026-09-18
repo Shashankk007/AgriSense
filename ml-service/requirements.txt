@@ -11,7 +11,7 @@
 fastapi==0.141.1
 uvicorn[standard]==0.53.0
 python-multipart==0.0.32          # For file upload support in FastAPI
-requests==2.34.2                  # HTTP client (cli_chat.py, check_models.py, test.py)
+requests==2.34.2                  # HTTP client (scripts/)
 
 # ---- Database (MongoDB) ----
 pymongo==4.8.0                    # MongoDB driver (used everywhere)

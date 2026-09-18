@@ -1,6 +1,6 @@
 import express from "express";
 import { addCrop, getCrops, updateCrop, deleteCrop } from "../controllers/crop-controller.js";
-import { isLoggedIn } from "../middlewares/isLoggerIn.js";
+import { isLoggedIn } from "../middlewares/isLoggedIn.js";
 const router = express.Router();
 router.post("/", isLoggedIn, addCrop);
 router.get("/:farmId", isLoggedIn, getCrops);

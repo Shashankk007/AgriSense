@@ -130,7 +130,6 @@ const Auth = () => {
             <GoogleLogin
               onSuccess={handleSuccess}
               onError={() => {
-                console.log('Login Failed');
                 alert("Google connection failed.");
               }}
               shape="rectangular"

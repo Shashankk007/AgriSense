@@ -1,7 +1,7 @@
 import express from "express";
 import { detectDisease, getDetectionHistory , deleteDetectionRecord, detectPest, getPestHistory } from "../controllers/detection-controller.js";
 import { upload } from '../middlewares/multer.js'; 
-import { isLoggedIn } from "../middlewares/isLoggerIn.js"; 
+import { isLoggedIn } from "../middlewares/isLoggedIn.js"; 
 
 const router = express.Router();
 

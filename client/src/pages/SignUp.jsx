@@ -241,7 +241,6 @@ const Signup = () => {
             <GoogleLogin 
               onSuccess={handleSuccess} 
               onError={() => {
-                console.log('Signup Failed');
                 alert('Google connection failed.');
               }} 
               shape="rectangular" 

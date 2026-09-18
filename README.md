@@ -94,3 +94,7 @@ The same checks run in GitHub Actions on every push and pull request.
 ## Contributors
 
 [@Shashankk007](https://github.com/Shashankk007), [@utkarsh-0410](https://github.com/utkarsh-0410), Tanish Mittal, [@VKantB05](https://github.com/VKantB05) and Aayush.
+
+## License
+
+[MIT](LICENSE)

@@ -208,3 +208,8 @@ export const deleteDetectionAPI = async (id) => {
 };
 
 //🟢 get current user api
+
+export const getFarmNdviAPI = async (farmId) => {
+  const response = await apiClient.get(`/farms/${farmId}/ndvi`);
+  return response.data;
+};

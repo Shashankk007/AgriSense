@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Polygon, useMap, LayersControl } from 'react-leaflet';
 import toast from 'react-hot-toast';
-import { getFarmsAPI, saveFarmBoundaryAPI } from '../api/farmApi';
-import axios from 'axios';
+import { getFarmsAPI, saveFarmBoundaryAPI, getFarmNdviAPI } from '../api/farmApi';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
@@ -172,13 +171,12 @@ const CropHealth = () => {
   const loadHealthData = async (farmId) => {
     try {
       setIsLoading(true);
-      const FAST_API_URL = import.meta.env.VITE_ML_SERVICE_URL || import.meta.env.VITE_FAST_API_URL || "http://localhost:8000";
-      const res = await axios.get(`${FAST_API_URL}/ndvi/${farmId}`);
-      setHealthData(res.data);
+      const data = await getFarmNdviAPI(farmId);
+      setHealthData(data);
       toast.success("Crop health data loaded!");
     } catch (err) {
       console.error(err);
-      toast.error(err.response?.data?.detail || "Failed to load NDVI data");
+      toast.error(err.response?.data?.message || "Failed to load NDVI data");
       setHealthData(null);
     } finally {
       setIsLoading(false);

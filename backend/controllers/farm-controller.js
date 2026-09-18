@@ -1,5 +1,9 @@
+import axios from "axios";
 import Farm from "../models/Farm.js";
 import * as turf from "@turf/turf";
+import apiError from "../utils/apiError.js";
+import wrapAsync from "../utils/wrapAsync.js";
+import { requireOwnedFarm } from "../utils/ownership.js";
 
 function closeRingIfNeeded(coordinates) {
   if (!Array.isArray(coordinates) || coordinates.length < 3) {
@@ -185,3 +189,26 @@ export async function deleteFarm(req, res) {
     });
   }
 }
+
+
+// NDVI is computed by the ML service (Google Earth Engine). It is server-to-server only, so the
+// ownership check happens here before the shared secret is attached.
+export const getFarmNdvi = wrapAsync(async (req, res) => {
+  const farm = await requireOwnedFarm(req.params.id, req.user._id);
+  const mlUrl = process.env.FAST_API_URL || "http://localhost:8000";
+
+  try {
+    const { data } = await axios.get(`${mlUrl}/ndvi/${farm._id}`, {
+      headers: { "X-Admin-Key": process.env.ML_ADMIN_KEY || "" },
+      timeout: 120000,
+    });
+    res.status(200).json(data);
+  } catch (err) {
+    const status = err.response?.status;
+    console.error("NDVI error:", err.response?.data || err.message);
+    if (status >= 400 && status < 500 && status !== 401 && status !== 403) {
+      throw new apiError(status, err.response?.data?.detail || "NDVI request rejected");
+    }
+    throw new apiError(502, err.response?.data?.detail || "NDVI service is unavailable right now.");
+  }
+});

@@ -55,3 +55,8 @@ class HistoryDB:
                 "updated_at": doc["updated_at"].isoformat()
             })
         return results
+
+    def get_owner(self, conversation_id: str) -> str | None:
+        """Returns the user_id that owns a conversation, or None if it does not exist yet."""
+        doc = self._collection.find_one({"conversation_id": conversation_id}, {"user_id": 1})
+        return doc["user_id"] if doc else None

@@ -10,6 +10,7 @@ import detectionRoutes from "./routes/detection-routes.js";
 import cropRoutes from "./routes/cropRoutes.js";
 import inventoryRoutes from "./routes/inventoryRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
+import chatRoutes from "./routes/chatRoutes.js";
 import { connectDb } from "./utils/db.js";
 import apiError from "./utils/apiError.js";
 dotenv.config();
@@ -38,6 +39,7 @@ app.use("/api/detections", detectionRoutes);
 app.use("/api/crops", cropRoutes);
 app.use("/api/inventory", inventoryRoutes);
 app.use("/api/analytics", analyticsRoutes);
+app.use("/api/chat", chatRoutes);
 
 // Handle unknown routes (use middleware to avoid path token parsing issues)
 app.use((req, res, next) => {

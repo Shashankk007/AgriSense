@@ -221,7 +221,7 @@ def health_check():
 
 # ---- NDVI ----
 
-@app.get("/ndvi/{farm_id}", tags=["NDVI"])
+@app.get("/ndvi/{farm_id}", tags=["NDVI"], dependencies=[Depends(require_admin)])
 def get_ndvi(farm_id: str):
     if not gee_ready:
         raise HTTPException(
@@ -233,7 +233,7 @@ def get_ndvi(farm_id: str):
         )
     return ndvi_service.compute_ndvi(farm_id)
 
-# ---- Prediction (called by the Node backend, not the browser) ----
+# ---- Prediction ----
 
 class PredictionRequest(BaseModel):
     image_url: str
@@ -268,19 +268,26 @@ def predict_pest(request: PredictionRequest):
 
 # ---- Chat ----
 
-@app.post("/chat", response_model=ChatResponse, tags=["Chat"])
+@app.post("/chat", response_model=ChatResponse, tags=["Chat"], dependencies=[Depends(require_admin)])
 async def chat(request: ChatRequest):
     """
     Main chat endpoint.
     Accepts a user message and returns an AI-generated agriculture response.
     Supports conversation continuity via conversation_id.
     Uses RAG (knowledge retrieval + memory) for context-aware responses.
+    Server-to-server only: the Express backend authenticates the user and supplies user_id.
     """
-    if chat_service is None:
+    if chat_service is None or history_db is None:
         raise HTTPException(status_code=503, detail="Service not initialized")
 
     try:
+        if request.conversation_id:
+            owner = await asyncio.to_thread(history_db.get_owner, request.conversation_id)
+            if owner is not None and owner != request.user_id:
+                raise HTTPException(status_code=404, detail="Conversation not found")
         return await chat_service.handle_chat(request)
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error("Chat endpoint error: %s", str(e), exc_info=True)
         raise HTTPException(
@@ -288,7 +295,7 @@ async def chat(request: ChatRequest):
             detail=f"An error occurred while processing your message: {str(e)}",
         )
 
-@app.get("/chat/history/{user_id}", tags=["Chat"])
+@app.get("/chat/history/{user_id}", tags=["Chat"], dependencies=[Depends(require_admin)])
 async def get_chat_history(user_id: str):
     """Lists a user's conversations (id, title, updated_at), newest first."""
     if history_db is None:
@@ -300,16 +307,21 @@ async def get_chat_history(user_id: str):
         raise HTTPException(status_code=500, detail="Failed to fetch history")
 
 
-@app.get("/chat/conversation/{conversation_id}", tags=["Chat"])
-async def get_conversation_messages(conversation_id: str):
-    """Returns the recent messages of one conversation."""
-    if chat_service is None:
+@app.get("/chat/conversation/{conversation_id}", tags=["Chat"], dependencies=[Depends(require_admin)])
+async def get_conversation_messages(conversation_id: str, user_id: str):
+    """Returns the recent messages of one conversation, only if it belongs to user_id."""
+    if chat_service is None or history_db is None:
         raise HTTPException(status_code=503, detail="Service not initialized")
     try:
+        owner = await asyncio.to_thread(history_db.get_owner, conversation_id)
+        if owner != user_id:
+            raise HTTPException(status_code=404, detail="Conversation not found")
         messages = await asyncio.to_thread(
             chat_service._conversation_memory.get_recent_messages, conversation_id
         )
         return {"messages": messages}
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error("Error fetching messages: %s", str(e), exc_info=True)
         raise HTTPException(status_code=500, detail="Failed to fetch messages")

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { sendChatMessageAPI, getChatHistoryAPI, getConversationAPI } from '../api/mlApi';
+import { sendChatMessageAPI, getChatHistoryAPI, getConversationAPI } from '../api/chatApi';
 import { X, Send, Loader2, Bot, Menu, Plus, MessageSquare } from 'lucide-react';
 
 const ChatbotWidgetInner = () => {
@@ -30,7 +30,7 @@ const ChatbotWidgetInner = () => {
       const fetchHistory = async () => {
         try {
           setIsLoadingHistory(true);
-          const history = await getChatHistoryAPI(user.id);
+          const history = await getChatHistoryAPI();
           setChatHistory(history);
         } catch (error) {
           console.error("Failed to load history", error);
@@ -98,7 +98,7 @@ const ChatbotWidgetInner = () => {
     setIsLoading(true);
 
     try {
-      const data = await sendChatMessageAPI(user.id, userMessage.text, conversationId);
+      const data = await sendChatMessageAPI(userMessage.text, conversationId);
       
       // Update conversation ID for continuity
       if (data.conversation_id) {

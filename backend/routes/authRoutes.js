@@ -55,15 +55,22 @@ router.post(
       throw new apiError(400, "Google credential is required");
     }
 
-    const ticket = await googleClient.verifyIdToken({
-      idToken: credential,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
-
-    const payload = ticket.getPayload();
+    let payload;
+    try {
+      const ticket = await googleClient.verifyIdToken({
+        idToken: credential,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+      payload = ticket.getPayload();
+    } catch {
+      throw new apiError(401, "Invalid Google credential");
+    }
 
     if (!payload?.email) {
       throw new apiError(400, "Google account email is required");
+    }
+    if (!payload.email_verified) {
+      throw new apiError(401, "Google account email is not verified");
     }
 
     let user = await User.findOne({ email: payload.email });

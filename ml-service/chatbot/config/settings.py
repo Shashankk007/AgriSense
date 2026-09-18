@@ -43,6 +43,7 @@ class Settings(BaseSettings):
     KNOWLEDGE_COLLECTION: str = "knowledge_base"
     MEMORY_COLLECTION: str = "user_memories"
     CONVERSATION_COLLECTION: str = "conversations"
+    CHAT_META_COLLECTION: str = "chat_metadata"
     MONGO_FARM_COLLECTION: str = "farms"
 
     # ---- Vector Search Index Names ----
@@ -52,10 +53,10 @@ class Settings(BaseSettings):
     # ---- LLM Configuration ----
     # NOTE: models can be listed by the API yet 404 when called (e.g. gemini-2.5-*); verify with a real call.
     LLM_MODEL: str = "gemini-3.6-flash"
-    EMBEDDING_MODEL: str = "models/gemini-embedding-001"
-    # Must match the numDimensions of your Atlas vector indexes (768 for the original indexes).
-    EMBEDDING_DIMENSIONS: int = 768
-    GROQ_MODEL: str = "openai/gpt-oss-20b"
+    # Embeddings run locally (no API key). Atlas vector indexes must use numDimensions = 384 for this model.
+    FASTEMBED_MODEL: str = "BAAI/bge-small-en-v1.5"
+    GROQ_MODEL: str = "openai/gpt-oss-20b"            # memory extraction (small/fast)
+    GROQ_CHAT_MODEL: str = "openai/gpt-oss-120b"      # main chat answers when GROQ_API_KEY is set
     # Used automatically when the primary model is overloaded (503) or otherwise fails. Empty disables it.
     LLM_FALLBACK_MODEL: Optional[str] = "gemini-3.5-flash-lite"
     LLM_TEMPERATURE: float = 0.3
@@ -66,6 +67,8 @@ class Settings(BaseSettings):
     ML_DEVICE: str = "cpu"
     # Shared secret for admin-only endpoints (knowledge upload, memory read/write). Endpoints are disabled if unset.
     ML_ADMIN_KEY: Optional[str] = None
+    # Hosts the prediction endpoints may download images from (comma-separated)
+    ALLOWED_IMAGE_HOSTS: str = "res.cloudinary.com"
 
     # ---- Google Earth Engine (optional — only needed for NDVI features) ----
     GEE_INIT_MODE: Optional[str] = None

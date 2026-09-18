@@ -34,6 +34,7 @@ import asyncio
 from chatbot.agents.memory_extractor import extract_memory_from_message
 from chatbot.chains.chat_chain import run_chat_chain
 from chatbot.memory.conversation import ConversationMemory
+from chatbot.memory.history_db import HistoryDB
 from chatbot.memory.long_term import LongTermMemory
 from chatbot.models.schemas import ChatRequest, ChatResponse, SourceDocument
 from chatbot.retrievers.knowledge import KnowledgeRetriever
@@ -53,11 +54,13 @@ class ChatService:
         self,
         conversation_memory: ConversationMemory,
         long_term_memory: LongTermMemory,
+        history_db: HistoryDB,
         knowledge_retriever: KnowledgeRetriever,
         memory_retriever: MemoryRetriever,
     ):
         self._conversation_memory = conversation_memory
         self._long_term_memory = long_term_memory
+        self._history_db = history_db
         self._knowledge_retriever = knowledge_retriever
         self._memory_retriever = memory_retriever
         self._background_tasks: set[asyncio.Task] = set()  # strong refs so tasks aren't garbage-collected mid-run
@@ -143,7 +146,18 @@ class ChatService:
         except Exception as e:
             logger.warning("Failed to persist conversation (non-fatal): %s", str(e))
 
-         # Step 6.5: Run memory extraction in the background
+        # Step 6.2: Record conversation metadata (powers the chat-history list)
+        try:
+            await asyncio.to_thread(
+                self._history_db.upsert_conversation,
+                conversation_id=conversation_id,
+                user_id=request.user_id,
+                title=request.message,
+            )
+        except Exception as e:
+            logger.warning("Failed to store chat metadata (non-fatal): %s", str(e))
+
+        # Step 6.5: Run memory extraction in the background
         task = asyncio.create_task(self._background_memory_extraction(request.user_id, request.message))
         self._background_tasks.add(task)
         task.add_done_callback(self._background_tasks.discard)

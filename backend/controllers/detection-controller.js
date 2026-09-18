@@ -1,215 +1,303 @@
-import DiseaseDetection from "../models/DiseaseDetection.js";
-import PestDetection from "../models/PestDetection.js";
+import { Detection } from "../models/DiseaseDetection.js";
+import wrapAsync from "../utils/wrapAsync.js";
 import apiError from "../utils/apiError.js";
-import { cloudinary, ensureCloudinaryConfig, uploadOnCloudinary } from "../utils/cloudinary.js";
+import { uploadOnCloudinary,cloudinary } from "../utils/cloudinary.js";
+import  Farm from "../models/Farm.js"; 
+import axios from "axios";
+import { requireOwnedFarm } from "../utils/ownership.js";
 
-const uploadDetectionImage = async (localFilePath, folder) => {
-    const uploadedImage = await uploadOnCloudinary(localFilePath, folder);
+// The ML service protects /predict/* with a shared secret (server-to-server only)
+// Read at call time: .env is loaded after ES module imports are evaluated.
+const mlHeaders = () => ({ "X-Admin-Key": process.env.ML_ADMIN_KEY || "" });
 
-    if (!uploadedImage) {
-        throw new apiError(500, "Image upload to Cloudinary failed. Check your CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET in .env");
-    }
 
-    return uploadedImage;
+// Removes images we just uploaded when the scan can't complete, so failed scans don't leave orphaned photos.
+const discardUploads = async (results) => {
+    await Promise.all(
+        (results || []).filter(Boolean).map((r) =>
+            cloudinary.uploader.destroy(r.public_id).catch((e) => console.error("Cloudinary cleanup failed:", r.public_id, e.message))
+        )
+    );
 };
 
-export const uploadDiseaseImage = async (req, res) => {
+// Keep meaningful 4xx answers from the ML service (bad image, nothing detected); everything else is a 500.
+const mlStatus = (err) => (err.response?.status >= 400 && err.response?.status < 500 ? err.response.status : 500);
+
+export const detectDisease = wrapAsync(async (req, res) => {
+    // 1. Frontend se farmId, naye farm ka naam aur live device coordinates catch karo
+    const { farmId, newFarmName, latitude, longitude, cropType, cropId } = req.body;
+    let finalFarmId = farmId;
+    if (farmId && !newFarmName) await requireOwnedFarm(farmId, req.user._id); // reject other users' farms
+
+    // 2. Validation Check for Files
+    if (!req.files || req.files.length === 0) {
+        throw new apiError(400, "Please upload at least one crop image for detection");
+    }
+    if (req.files.length > 5) {
+        throw new apiError(400, "Maximum 5 images allowed at a time");
+    }
+
+    // 🟢 3. IF NEW FARM REQUESTED: Save it first with proper GeoJSON validation
+    if (newFarmName) {
+        // Agar frontend se direct location aayi hai toh use karo, nahi toh safe default India ke coordinates
+        const lat = latitude ? parseFloat(latitude) : 20.5937;
+        const lng = longitude ? parseFloat(longitude) : 78.9629;
+
+        // GeoJSON Polygon ke liye pehla aur aakhiri point hamesha loop close karne ke liye same hona chahiye
+        const polygonCoordinates = [
+            [
+                [lng - 0.001, lat - 0.001], // Bottom-Left
+                [lng + 0.001, lat - 0.001], // Bottom-Right
+                [lng + 0.001, lat + 0.001], // Top-Right
+                [lng - 0.001, lat + 0.001], // Top-Left
+                [lng - 0.001, lat - 0.001]  // Closing back to Bottom-Left
+            ]
+        ];
+
+        const newFarm = await Farm.create({
+            userId: req.user.id,
+            farmName: newFarmName,
+            area: {
+                value: 1, // Default safe value
+                unit: "acre"
+            },
+            boundary: {
+                type: "Polygon",
+                coordinates: polygonCoordinates
+            }
+        });
+
+        finalFarmId = newFarm._id; // Replace with newly generated Farm ID
+    }
+
+    // 4. Cloudinary Multi-upload (Promise.all)
+    const cloudinaryUploadPromises = req.files.map(file => uploadOnCloudinary(file.path, "agrisense/detections"));
+    const cloudinaryResults = await Promise.all(cloudinaryUploadPromises);
+
+    const failedUploads = cloudinaryResults.filter(result => result === null);
+    if (failedUploads.length > 0) {
+        throw new apiError(500, "Failed to upload some images to cloud storage");
+    }
+
+    const imageUrlsForML = cloudinaryResults.map(img => img.secure_url);
+
+    // 5. FastAPI / ML Execution
+    let mlPredictions = [];
     try {
-        if (!req.file) {
-            throw new apiError(400, "Image is required");
-        }
-
-        const uploadedImage = await uploadDetectionImage(
-            req.file.path,
-            "agrisense/disease-detections"
-        );
-
-        const detection = await DiseaseDetection.create({
-            user: req.user._id,
-            imageUrl: uploadedImage.secure_url,
-            cloudinaryId: uploadedImage.public_id,
-        });
-
-        res.status(201).json({
-            success: true,
-            message: "Disease image uploaded successfully",
-            detection
-        });
-
-    } catch (err) {
-        res.status(err.statusCode || 500).json({
-            success: false,
-            message: err.message
-        });
+        const FAST_API_URL = process.env.FAST_API_URL || "http://localhost:8000";
+        
+        mlPredictions = await Promise.all(imageUrlsForML.map(async (url) => {
+            try {
+                const response = await axios.post(`${FAST_API_URL}/predict/disease`, { image_url: url }, { headers: mlHeaders(), timeout: 60000 });
+                const { prediction } = response.data;
+                const details = prediction.details || {};
+                
+                return {
+                    diseaseName: prediction.class || "Unknown",
+                    confidenceScore: prediction.confidence_score || 0,
+                    isHealthy: prediction.class === "Healthy",
+                    severity: details.severity || "None",
+                    diseaseType: details.disease_type || "Unknown",
+                    affectedPart: details.affected_part || "Leaf",
+                    cause: details.cause || "Unknown",
+                    precautions: details.prevention ? [details.prevention] : [],
+                    treatments: details.solution ? [details.solution] : []
+                };
+            } catch (err) {
+                console.error("FastAPI Error for URL:", url, err.response?.data || err.message);
+                throw new apiError(mlStatus(err), err.response?.data?.detail || "Machine Learning model is not working. Please try again later.");
+            }
+        }));
+    } catch (error) {
+        console.error("FastAPI Overall Error:", error);
+        await discardUploads(cloudinaryResults);
+        if (error.statusCode) throw error;
+        throw new apiError(500, "Machine Learning service error");
     }
-};
 
-export const uploadPestImage = async (req, res) => {
+    // 6. DB Scheme compliance mapping
+    const imagesDataForDB = cloudinaryResults.map((cloudData, index) => {
+        const mlData = mlPredictions[index];
+        return {
+            cloudinaryUrl: cloudData.secure_url,
+            cloudinaryPublicId: cloudData.public_id,
+            prediction: {
+                diseaseName: mlData.diseaseName,
+                confidenceScore: mlData.confidenceScore,
+                isHealthy: mlData.isHealthy,
+                severity: mlData.severity,
+                diseaseType: mlData.diseaseType,
+                affectedPart: mlData.affectedPart,
+                cause: mlData.cause
+            },
+            precautions: mlData.precautions,
+            treatments: mlData.treatments
+        };
+    });
+
+    const uniqueDiseases = [...new Set(mlPredictions.map(p => p.diseaseName))];
+
+    // 7. Master DB document Creation
+    const newDetection = await Detection.create({
+        user: req.user.id,
+        farmId: finalFarmId || null,
+        cropId: cropId || null,
+        cropType: cropType || "Unknown",
+        images: imagesDataForDB,
+        status: "completed",
+        totalImagesScanned: imagesDataForDB.length,
+        diseasesFoundSummary: uniqueDiseases
+    });
+
+    // Cleaned response format optimization fixed earlier
+    return res.status(200).json({
+        success: true,
+        message: "Crop analysis completed successfully",
+        detectionResult: newDetection
+    });
+});
+
+// 🟢 NAYA FUNCTION: HISTORY PAGE KE LIYE
+export const getDetectionHistory = wrapAsync(async (req, res) => {
+    // User ki saari history nikalo aur naye se purane (descending) order mein sort karo
+    const history = await Detection.find({ user: req.user.id })
+        .sort({ createdAt: -1 })
+        .populate("farmId", "farmName"); // Farm ka naam bhi sath layega
+
+    return res.status(200).json({
+        success: true,
+        history
+    });
+});
+
+export const getPestHistory = wrapAsync(async (req, res) => {
+    // Note: PestDetection uses farmId directly, assuming it's linked
+    // However, PestDetection model doesn't explicitly store userId in the snippet provided.
+    // Let's check how PestDetection is saved.
+    // Wait, in detectPest: await PestDetection.create({ farmId: finalFarmId, ... })
+    // If there is no user field, how do we filter? Let's check PestDetection schema later or just find by farmId if possible, but let's assume we can fetch it if we populate.
+    
+    // Query by userId to include both assigned and unassigned (no farm) pest scans
+    const history = await PestDetection.find({ userId: req.user.id })
+        .sort({ createdAt: -1 })
+        .populate("farmId", "farmName");
+
+    return res.status(200).json({
+        success: true,
+        history
+    });
+});
+
+import PestDetection from "../models/PestDetection.js";
+
+export const detectPest = wrapAsync(async (req, res) => {
+    const { farmId, newFarmName, latitude, longitude } = req.body;
+    let finalFarmId = farmId;
+    if (farmId && !newFarmName) await requireOwnedFarm(farmId, req.user._id); // reject other users' farms
+
+    if (!req.files || req.files.length === 0) {
+        throw new apiError(400, "Please upload at least one crop image for detection");
+    }
+
+    if (newFarmName) {
+        const lat = latitude ? parseFloat(latitude) : 20.5937;
+        const lng = longitude ? parseFloat(longitude) : 78.9629;
+        const polygonCoordinates = [
+            [[lng - 0.001, lat - 0.001], [lng + 0.001, lat - 0.001], [lng + 0.001, lat + 0.001], [lng - 0.001, lat + 0.001], [lng - 0.001, lat - 0.001]]
+        ];
+        const newFarm = await Farm.create({
+            userId: req.user.id,
+            farmName: newFarmName,
+            area: { value: 1, unit: "acre" },
+            boundary: { type: "Polygon", coordinates: polygonCoordinates }
+        });
+        finalFarmId = newFarm._id;
+    }
+
+    const cloudinaryUploadPromises = req.files.map(file => uploadOnCloudinary(file.path, "agrisense/pests"));
+    const cloudinaryResults = await Promise.all(cloudinaryUploadPromises);
+
+    const failedUploads = cloudinaryResults.filter(result => result === null);
+    if (failedUploads.length > 0) {
+        throw new apiError(500, "Failed to upload some images to cloud storage");
+    }
+
+    const FAST_API_URL = process.env.FAST_API_URL || "http://localhost:8000";
+    
+    let pestRecords;
     try {
-        if (!req.file) {
-            throw new apiError(400, "Image is required");
+    pestRecords = await Promise.all(cloudinaryResults.map(async (cloudData) => {
+        let pestName = "Unknown";
+        let confidence = 0;
+        let recommendation = "";
+        
+        try {
+            const response = await axios.post(`${FAST_API_URL}/predict/pest`, { image_url: cloudData.secure_url }, { headers: mlHeaders(), timeout: 60000 });
+            const { prediction } = response.data;
+            const details = prediction.details || {};
+            
+            pestName = details.pest_name || `Class ${prediction.class}`;
+            confidence = prediction.confidence_score;
+            recommendation = (details.remedies || []).join(" | ");
+        } catch (err) {
+            console.error("FastAPI Pest Error:", err.response?.data || err.message);
+            throw new apiError(mlStatus(err), err.response?.data?.detail || "Pest prediction model is not working. Please try again later.");
         }
 
-        const uploadedImage = await uploadDetectionImage(
-            req.file.path,
-            "agrisense/pest-detections"
-        );
-
-        const detection = await PestDetection.create({
-            user: req.user._id,
-            imageUrl: uploadedImage.secure_url,
-            cloudinaryId: uploadedImage.public_id,
+        return await PestDetection.create({
+            userId: req.user.id,
+            farmId: finalFarmId || null,
+            imageUrl: cloudData.secure_url,
+            pestName,
+            confidence,
+            severity: "Medium", // Or detect from details
+            recommendation
         });
-
-        res.status(201).json({
-            success: true,
-            message: "Pest image uploaded successfully",
-            detection
-        });
-
-    } catch (err) {
-        res.status(err.statusCode || 500).json({
-            success: false,
-            message: err.message
-        });
+    }));
+    } catch (error) {
+        await discardUploads(cloudinaryResults);
+        throw error;
     }
-};
 
-export const getUserDiseaseImages = async (req, res) => {
-    try {
-        const { userId } = req.params;
-        if (String(userId) !== String(req.user._id)) {
-            throw new apiError(403, "You can only view your own scans");
-        }
+    return res.status(200).json({
+        success: true,
+        message: "Pest analysis completed successfully",
+        detectionResult: pestRecords
+    });
+});
 
-        const detections = await DiseaseDetection
-            .find({ user: userId })
-            .sort({ createdAt: -1 });
+// 🟢 NAYA FUNCTION: DELETE DETECTION RECORD
+export const deleteDetectionRecord = wrapAsync(async (req, res) => {
+    const { id } = req.params;
 
-        res.status(200).json({
-            success: true,
-            count: detections.length,
-            detections
-        });
-    } catch (err) {
-        res.status(err.statusCode || 500).json({
-            success: false,
-            message: err.message
-        });
+    // 1. Pehle database se record dhoondho
+    const detection = await Detection.findOne({ _id: id, user: req.user.id });
+    
+    if (!detection) {
+        throw new apiError(404, "Detection record not found");
     }
-};
 
-export const getUserPestImages = async (req, res) => {
-    try {
-        const { userId } = req.params;
-        if (String(userId) !== String(req.user._id)) {
-            throw new apiError(403, "You can only view your own scans");
-        }
-
-        const detections = await PestDetection
-            .find({ user: userId })
-            .sort({ createdAt: -1 });
-
-        res.status(200).json({
-            success: true,
-            count: detections.length,
-            detections
+    // 2. Cloudinary se saari images delete karo
+    if (detection.images && detection.images.length > 0) {
+        const deletePromises = detection.images.map(async (img) => {
+            if (img.cloudinaryPublicId) {
+                try {
+                    await cloudinary.uploader.destroy(img.cloudinaryPublicId);
+                } catch (error) {
+                    console.error("Cloudinary delete failed for:", img.cloudinaryPublicId);
+                    // Agar cloud se delete fail bhi ho jaye, toh aage badho
+                }
+            }
+            return null;
         });
-    } catch (err) {
-        res.status(err.statusCode || 500).json({
-            success: false,
-            message: err.message
-        });
+        await Promise.all(deletePromises);
     }
-};
 
-export const getUserDetectionImages = async (req, res) => {
-    try {
-        const { userId } = req.params;
-        if (String(userId) !== String(req.user._id)) {
-            throw new apiError(403, "You can only view your own scans");
-        }
+    // 3. Database se document hamesha ke liye delete kar do
+    await Detection.findByIdAndDelete(id);
 
-        const [diseaseDetections, pestDetections] = await Promise.all([
-            DiseaseDetection.find({ user: userId }).sort({ createdAt: -1 }),
-            PestDetection.find({ user: userId }).sort({ createdAt: -1 })
-        ]);
-
-        res.status(200).json({
-            success: true,
-            diseaseCount: diseaseDetections.length,
-            pestCount: pestDetections.length,
-            diseaseDetections,
-            pestDetections
-        });
-    } catch (err) {
-        res.status(err.statusCode || 500).json({
-            success: false,
-            message: err.message
-        });
-    }
-};
-
-export const deleteDiseaseImage = async (req, res) => {
-    try {
-        const { detectionId } = req.params;
-
-        const detection = await DiseaseDetection.findOne({
-            _id: detectionId,
-            user: req.user._id
-        });
-
-        if (!detection) {
-            throw new apiError(404, "Disease detection image not found");
-        }
-
-        if (detection.cloudinaryId) {
-            ensureCloudinaryConfig();
-            await cloudinary.uploader.destroy(detection.cloudinaryId);
-        }
-
-        await detection.deleteOne();
-
-        res.status(200).json({
-            success: true,
-            message: "Disease detection image deleted successfully"
-        });
-    } catch (err) {
-        res.status(err.statusCode || 500).json({
-            success: false,
-            message: err.message
-        });
-    }
-};
-
-export const deletePestImage = async (req, res) => {
-    try {
-        const { detectionId } = req.params;
-
-        const detection = await PestDetection.findOne({
-            _id: detectionId,
-            user: req.user._id
-        });
-
-        if (!detection) {
-            throw new apiError(404, "Pest detection image not found");
-        }
-
-        if (detection.cloudinaryId) {
-            ensureCloudinaryConfig();
-            await cloudinary.uploader.destroy(detection.cloudinaryId);
-        }
-
-        await detection.deleteOne();
-
-        res.status(200).json({
-            success: true,
-            message: "Pest detection image deleted successfully"
-        });
-    } catch (err) {
-        res.status(err.statusCode || 500).json({
-            success: false,
-            message: err.message
-        });
-    }
-};
+    return res.status(200).json({
+        success: true,
+        message: "Scan record and associated images deleted successfully"
+    });
+});

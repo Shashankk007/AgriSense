@@ -8,15 +8,18 @@ from typing import Optional
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 from pymongo import MongoClient
 
 # --- NDVI Service Imports ---
 from gee.gee_init import initialize_gee
 from services.ndvi_service import NDVIService
+from services.prediction_service import NoDetectionError, PredictionService
 
 # --- Chatbot Service Imports ---
 from chatbot.config.settings import get_settings
 from chatbot.memory.conversation import ConversationMemory
+from chatbot.memory.history_db import HistoryDB
 from chatbot.memory.long_term import LongTermMemory
 from chatbot.models.schemas import (
     ChatRequest, ChatResponse, HealthResponse, KnowledgeUploadRequest,
@@ -41,6 +44,8 @@ mongo_client: Optional[MongoClient] = None
 chat_service: Optional[ChatService] = None
 knowledge_service: Optional[KnowledgeService] = None
 long_term_memory: Optional[LongTermMemory] = None
+history_db: Optional[HistoryDB] = None
+prediction_service: Optional[PredictionService] = None
 
 # NDVI globals
 ndvi_service: Optional[NDVIService] = None
@@ -58,7 +63,7 @@ async def lifespan(app: FastAPI):
     - Startup: connect to MongoDB, initialize all services (Chatbot + NDVI).
     - Shutdown: close MongoDB connection.
     """
-    global mongo_client, chat_service, knowledge_service, long_term_memory
+    global mongo_client, chat_service, knowledge_service, long_term_memory, history_db, prediction_service
     global ndvi_service, gee_ready, gee_error
     
     settings = get_settings()
@@ -82,6 +87,7 @@ async def lifespan(app: FastAPI):
     # 2. Initialize Chatbot modules
     conversation_memory = ConversationMemory(mongo_client)
     long_term_memory = LongTermMemory(mongo_client)
+    history_db = HistoryDB(mongo_client)
     vector_store = MongoVectorStore(mongo_client)
     knowledge_retriever = KnowledgeRetriever(vector_store)
     memory_retriever = MemoryRetriever(long_term_memory)
@@ -89,6 +95,7 @@ async def lifespan(app: FastAPI):
     chat_service = ChatService(
         conversation_memory=conversation_memory,
         long_term_memory=long_term_memory,
+        history_db=history_db,
         knowledge_retriever=knowledge_retriever,
         memory_retriever=memory_retriever,
     )
@@ -116,6 +123,13 @@ async def lifespan(app: FastAPI):
         gee_ready = False
         gee_error = str(exc)
         logger.error(f"❌ Google Earth Engine initialization deferred: {gee_error}")
+
+    # 4. Initialize disease/pest prediction models (optional; endpoints return 503 if unavailable)
+    try:
+        prediction_service = PredictionService()
+        logger.info("✅ Prediction Service initialized!")
+    except Exception as e:
+        logger.error("❌ Prediction Service failed to initialize: %s", e)
 
     logger.info("✅ All services initialized!")
 
@@ -219,6 +233,39 @@ def get_ndvi(farm_id: str):
         )
     return ndvi_service.compute_ndvi(farm_id)
 
+# ---- Prediction (called by the Node backend, not the browser) ----
+
+class PredictionRequest(BaseModel):
+    image_url: str
+
+
+@app.post("/predict/disease", tags=["Prediction"], dependencies=[Depends(require_admin)])
+def predict_disease(request: PredictionRequest):
+    if prediction_service is None:
+        raise HTTPException(status_code=503, detail="Prediction service not initialized")
+    try:
+        return {"success": True, "prediction": prediction_service.predict_disease(request.image_url)}
+    except ValueError as e:  # rejected image URL
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error("Disease prediction error: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/predict/pest", tags=["Prediction"], dependencies=[Depends(require_admin)])
+def predict_pest(request: PredictionRequest):
+    if prediction_service is None:
+        raise HTTPException(status_code=503, detail="Prediction service not initialized")
+    try:
+        return {"success": True, "prediction": prediction_service.predict_pest(request.image_url)}
+    except NoDetectionError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error("Pest prediction error: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
 # ---- Chat ----
 
 @app.post("/chat", response_model=ChatResponse, tags=["Chat"])
@@ -240,6 +287,32 @@ async def chat(request: ChatRequest):
             status_code=500,
             detail=f"An error occurred while processing your message: {str(e)}",
         )
+
+@app.get("/chat/history/{user_id}", tags=["Chat"])
+async def get_chat_history(user_id: str):
+    """Lists a user's conversations (id, title, updated_at), newest first."""
+    if history_db is None:
+        raise HTTPException(status_code=503, detail="Service not initialized")
+    try:
+        return await asyncio.to_thread(history_db.get_user_conversations, user_id)
+    except Exception as e:
+        logger.error("Error fetching history: %s", str(e), exc_info=True)
+        raise HTTPException(status_code=500, detail="Failed to fetch history")
+
+
+@app.get("/chat/conversation/{conversation_id}", tags=["Chat"])
+async def get_conversation_messages(conversation_id: str):
+    """Returns the recent messages of one conversation."""
+    if chat_service is None:
+        raise HTTPException(status_code=503, detail="Service not initialized")
+    try:
+        messages = await asyncio.to_thread(
+            chat_service._conversation_memory.get_recent_messages, conversation_id
+        )
+        return {"messages": messages}
+    except Exception as e:
+        logger.error("Error fetching messages: %s", str(e), exc_info=True)
+        raise HTTPException(status_code=500, detail="Failed to fetch messages")
 
 # ---- Knowledge ----
 

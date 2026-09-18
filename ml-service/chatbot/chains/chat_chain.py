@@ -45,15 +45,29 @@ def _build_gemini(model: str, max_retries: int) -> ChatGoogleGenerativeAI:
 
 def get_llm():
     """
-    Initializes the Gemini LLM. If LLM_FALLBACK_MODEL is set, a second model takes over
-    when the primary fails (e.g. 503 "high demand"), instead of making the user wait through retries.
+    Builds the chat LLM with automatic failover:
+      Groq (if GROQ_API_KEY is set) -> Gemini primary -> Gemini fallback model.
+    Failover matters because providers return 503/429 during demand spikes.
     """
     settings = get_settings()
+    gemini = _build_gemini(settings.LLM_MODEL, max_retries=1)
+    backups = []
     fallback = settings.LLM_FALLBACK_MODEL
     if fallback and fallback != settings.LLM_MODEL:
-        primary = _build_gemini(settings.LLM_MODEL, max_retries=1)
-        return primary.with_fallbacks([_build_gemini(fallback, max_retries=2)])
-    return _build_gemini(settings.LLM_MODEL, max_retries=2)
+        backups.append(_build_gemini(fallback, max_retries=2))
+
+    if settings.GROQ_API_KEY:
+        from langchain_groq import ChatGroq
+        logger.info("LLM: Groq (%s) primary, Gemini fallback", settings.GROQ_CHAT_MODEL)
+        primary = ChatGroq(
+            model=settings.GROQ_CHAT_MODEL,
+            api_key=settings.GROQ_API_KEY,
+            temperature=settings.LLM_TEMPERATURE,
+            max_retries=1,
+        )
+        return primary.with_fallbacks([gemini, *backups])
+
+    return gemini.with_fallbacks(backups) if backups else gemini
 
 
 async def run_chat_chain(

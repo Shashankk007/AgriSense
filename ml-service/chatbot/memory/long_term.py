@@ -35,7 +35,7 @@ Storage format per document:
 import asyncio
 from datetime import datetime, timezone
 
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
+from langchain_community.embeddings.fastembed import FastEmbedEmbeddings
 from pymongo import MongoClient
 
 from chatbot.config.settings import get_settings
@@ -53,11 +53,7 @@ class LongTermMemory:
         settings = get_settings()
         self._db = mongo_client[settings.DATABASE_NAME]
         self._collection = self._db[settings.MEMORY_COLLECTION]
-        self._embeddings = GoogleGenerativeAIEmbeddings(
-            model=settings.EMBEDDING_MODEL,
-            google_api_key=settings.GOOGLE_API_KEY,
-            output_dimensionality=settings.EMBEDDING_DIMENSIONS,
-        )
+        self._embeddings = FastEmbedEmbeddings(model_name=settings.FASTEMBED_MODEL)
         logger.info(
             "LongTermMemory initialized | collection=%s",
             settings.MEMORY_COLLECTION,
@@ -72,6 +68,11 @@ class LongTermMemory:
             fact:    The fact text (e.g., "I grow wheat on 5 acres in Punjab").
         """
         logger.info("Storing memory for user=%s: %s", user_id, fact[:60])
+
+        # Skip exact duplicates (the extractor also avoids re-stating known facts)
+        if await asyncio.to_thread(self._collection.find_one, {"user_id": user_id, "fact": fact}):
+            logger.info("Fact already stored for user=%s, skipping", user_id)
+            return
 
         # Generate embedding for the fact
         embedding = await asyncio.to_thread(self._embeddings.embed_query, fact)

@@ -2,11 +2,10 @@ import mongoose from "mongoose";
 
 const pestDetectionSchema = new mongoose.Schema(
 {
-    user:{
+    userId:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"User",
-        required:true,
-        index:true
+        required:true
     },
 
     farmId:{
@@ -18,8 +17,6 @@ const pestDetectionSchema = new mongoose.Schema(
         type:String,
         required:true
     },
-
-    cloudinaryId:String,
 
     pestName:String,
 
